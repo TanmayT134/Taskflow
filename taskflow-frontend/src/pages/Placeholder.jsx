@@ -1,0 +1,1 @@
+export default function Placeholder({title}){return <div className="coming-soon"><div>✦</div><span className="eyebrow">ON THE ROADMAP</span><h2>{title}</h2><p>This space is being prepared. Your task workspace is ready to use in the meantime.</p></div>;}
