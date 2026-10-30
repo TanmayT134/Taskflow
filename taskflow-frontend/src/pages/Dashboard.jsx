@@ -19,8 +19,10 @@ import { greeting } from "../utils/format";
 import StatCard from "../components/StatCard";
 import TaskTable from "../components/TaskTable";
 import TaskModal from "../components/TaskModal";
+import { useFeedback } from "../context/FeedbackContext";
 
 export default function Dashboard() {
+    const { confirm, notify } = useFeedback();
     const [stats, setStats] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [allTasks, setAllTasks] = useState([]);
@@ -93,8 +95,10 @@ export default function Dashboard() {
         try {
             if (editingTask) {
                 await taskService.updateTask(editingTask.id, payload);
+                notify("Task updated successfully.");
             } else {
                 await taskService.createTask(payload);
+                notify("Task created successfully.");
             }
 
             setModalOpen(false);
@@ -110,14 +114,25 @@ export default function Dashboard() {
 
     // Mark task completed or pending
     async function handleToggleTask(task) {
+        const nextCompleted = !task.completed;
+        const confirmed = await confirm({
+            title: nextCompleted ? "Complete this task?" : "Restore this task?",
+            message: nextCompleted
+                ? `Mark "${task.title}" as completed?`
+                : `Move "${task.title}" back to pending?`,
+            confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+        });
+        if (!confirmed) return;
+
         setBusyId(task.id);
         setError("");
 
         try {
             await taskService.setCompleted(
                 task.id,
-                !task.completed
+                nextCompleted
             );
+            notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
 
             await loadDashboard();
         } catch (err) {
@@ -129,9 +144,12 @@ export default function Dashboard() {
 
     // Delete task
     async function handleDeleteTask(task) {
-        const confirmed = window.confirm(
-            `Are you sure you want to delete "${task.title}"?`
-        );
+        const confirmed = await confirm({
+            title: "Delete this task?",
+            message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+            confirmLabel: "Delete task",
+            tone: "danger",
+        });
 
         if (!confirmed) return;
 
@@ -140,6 +158,7 @@ export default function Dashboard() {
 
         try {
             await taskService.deleteTask(task.id);
+            notify("Task deleted successfully.");
 
             await loadDashboard();
         } catch (err) {

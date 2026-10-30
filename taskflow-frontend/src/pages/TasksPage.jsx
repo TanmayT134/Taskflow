@@ -15,9 +15,11 @@ import { getApiError } from "../services/api";
 import TaskTable from "../components/TaskTable";
 import TaskModal from "../components/TaskModal";
 import { usePreferences } from "../context/PreferencesContext";
+import { useFeedback } from "../context/FeedbackContext";
 
 export default function TasksPage({ mode = "all" }) {
   const { preferences } = usePreferences();
+  const { confirm, notify } = useFeedback();
   const [data, setData] = useState({
     content: [],
     pageNumber: 0,
@@ -116,8 +118,10 @@ export default function TasksPage({ mode = "all" }) {
     try {
       if (editing) {
         await taskService.updateTask(editing.id, payload);
+        notify("Task updated successfully.");
       } else {
         await taskService.createTask(payload);
+        notify("Task created successfully.");
       }
 
       setModalOpen(false);
@@ -140,9 +144,12 @@ export default function TasksPage({ mode = "all" }) {
       ? "mark this task as completed"
       : "move this task back to pending";
 
-    const confirmed = window.confirm(
-      `Are you sure you want to ${action}?\n\n"${task.title}"`
-    );
+    const confirmed = await confirm({
+      title: nextCompleted ? "Complete this task?" : "Restore this task?",
+      message: `Are you sure you want to ${action}? "${task.title}"`,
+      confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+      tone: "default",
+    });
 
     if (!confirmed) return;
 
@@ -151,6 +158,7 @@ export default function TasksPage({ mode = "all" }) {
 
     try {
       await taskService.setCompleted(task.id, nextCompleted);
+      notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
 
       // If the last row on a later page moves to another status, step back
       // so the user does not land on an empty out-of-range page.
@@ -167,9 +175,12 @@ export default function TasksPage({ mode = "all" }) {
   }
 
   async function deleteTask(task) {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${task.title}"?`
-    );
+    const confirmed = await confirm({
+      title: "Delete this task?",
+      message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+      confirmLabel: "Delete task",
+      tone: "danger",
+    });
 
     if (!confirmed) return;
 
@@ -178,6 +189,7 @@ export default function TasksPage({ mode = "all" }) {
 
     try {
       await taskService.deleteTask(task.id);
+      notify("Task deleted successfully.");
 
       if (data.content.length === 1 && page > 0) {
         setPage((current) => Math.max(0, current - 1));

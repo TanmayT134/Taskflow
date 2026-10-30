@@ -40,6 +40,7 @@ export default function TaskTable({
 
         {showEmptyCreate && onCreate && (
           <button
+            type="button"
             className="btn btn-primary empty-create-btn"
             onClick={onCreate}
           >
@@ -85,6 +86,7 @@ export default function TaskTable({
 
           <div className="task-actions">
             <button
+              type="button"
               className="icon-button"
               onClick={() => onEdit(task)}
               title="Edit task"
@@ -94,6 +96,7 @@ export default function TaskTable({
               <Pencil size={16} />
             </button>
             <button
+              type="button"
               className="icon-button danger-hover"
               onClick={() => onDelete(task)}
               title="Delete task"

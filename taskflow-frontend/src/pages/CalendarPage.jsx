@@ -13,6 +13,7 @@ import { taskService } from "../services/taskService";
 import { getApiError } from "../services/api";
 import TaskModal from "../components/TaskModal";
 import { formatDate, isOverdue } from "../utils/format";
+import { useFeedback } from "../context/FeedbackContext";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -52,6 +53,7 @@ function buildCalendarDays(year, month) {
 }
 
 export default function CalendarPage() {
+  const { confirm, notify } = useFeedback();
   const today = new Date();
   const [visibleMonth, setVisibleMonth] = useState(
     new Date(today.getFullYear(), today.getMonth(), 1)
@@ -155,8 +157,10 @@ export default function CalendarPage() {
     try {
       if (editing) {
         await taskService.updateTask(editing.id, payload);
+        notify("Task updated successfully.");
       } else {
         await taskService.createTask(payload);
+        notify("Task created successfully.");
       }
       setModalOpen(false);
       setEditing(null);
@@ -171,14 +175,18 @@ export default function CalendarPage() {
   async function toggleTask(task) {
     const nextCompleted = !task.completed;
     const action = nextCompleted ? "complete" : "move back to pending";
-    if (!window.confirm(`Are you sure you want to ${action} "${task.title}"?`)) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: nextCompleted ? "Complete this task?" : "Restore this task?",
+      message: `Are you sure you want to ${action} "${task.title}"?`,
+      confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+    });
+    if (!confirmed) return;
 
     setBusyId(task.id);
     setError("");
     try {
       await taskService.setCompleted(task.id, nextCompleted);
+      notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
       await loadTasks();
     } catch (err) {
       setError(getApiError(err));
@@ -188,14 +196,19 @@ export default function CalendarPage() {
   }
 
   async function deleteTask(task) {
-    if (!window.confirm(`Are you sure you want to delete "${task.title}"?`)) {
-      return;
-    }
+    const confirmed = await confirm({
+      title: "Delete this task?",
+      message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+      confirmLabel: "Delete task",
+      tone: "danger",
+    });
+    if (!confirmed) return;
 
     setBusyId(task.id);
     setError("");
     try {
       await taskService.deleteTask(task.id);
+      notify("Task deleted successfully.");
       await loadTasks();
     } catch (err) {
       setError(getApiError(err));
