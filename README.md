@@ -8,7 +8,7 @@
 
 ---
 
-# 🚀 Taskflow — Full-Stack Task Management System
+# 🚀 Taskflow - Full-Stack Task Management System
 
 <p align="center">
   <img src="assets/GIF/GIF.gif" width="100%" alt="Taskflow Application Demo">
