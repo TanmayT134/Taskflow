@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Plus,
   Search,
@@ -19,6 +20,7 @@ import { useFeedback } from "../context/FeedbackContext";
 import ErrorBanner from "../components/ErrorBanner";
 
 export default function TasksPage({ mode = "all" }) {
+  const [searchParams] = useSearchParams();
   const { preferences } = usePreferences();
   const { confirm, notify } = useFeedback();
   const [data, setData] = useState({
@@ -28,7 +30,7 @@ export default function TasksPage({ mode = "all" }) {
     totalElements: 0,
   });
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => searchParams.get("search") || "");
   const [priority, setPriority] = useState("");
   const [status, setStatus] = useState("all");
   const [sortBy, setSortBy] = useState(() => preferences.sortBy);
@@ -100,6 +102,12 @@ export default function TasksPage({ mode = "all" }) {
     isPendingPage,
     isCompletedPage,
   ]);
+
+  useEffect(() => {
+    const query = searchParams.get("search") || "";
+    setSearch((current) => current === query ? current : query);
+    setPage(0);
+  }, [searchParams]);
 
   useEffect(() => {
     const timer = setTimeout(load, 250);
