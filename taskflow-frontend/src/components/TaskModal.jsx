@@ -16,6 +16,7 @@ export default function TaskModal({ open, onClose, onSave, task, saving }) {
   const titleRef = useRef(null);
   const modalRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -82,6 +83,7 @@ export default function TaskModal({ open, onClose, onSave, task, saving }) {
 
   async function submit(event) {
     event.preventDefault();
+    if (saving || submittingRef.current) return;
 
     const title = form.title.trim();
     if (!title) {
@@ -97,12 +99,17 @@ export default function TaskModal({ open, onClose, onSave, task, saving }) {
     }
 
     setValidationError("");
-    await onSave({
-      ...form,
-      title,
-      description: form.description.trim(),
-      dueDate: form.dueDate || null,
-    });
+    submittingRef.current = true;
+    try {
+      await onSave({
+        ...form,
+        title,
+        description: form.description.trim(),
+        dueDate: form.dueDate || null,
+      });
+    } finally {
+      submittingRef.current = false;
+    }
   }
 
   return (

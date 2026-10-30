@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,13 +7,15 @@ import {
   RefreshCw,
   Check,
   Clock3,
-  CircleAlert,
 } from "lucide-react";
 import { taskService } from "../services/taskService";
 import { getApiError } from "../services/api";
 import TaskModal from "../components/TaskModal";
+import { CalendarGridSkeleton, AgendaSkeleton } from "../components/LoadingSkeletons";
 import { formatDate, isOverdue } from "../utils/format";
 import { useFeedback } from "../context/FeedbackContext";
+import ErrorBanner from "../components/ErrorBanner";
+import { fetchAllTaskPages } from "../utils/fetchAllTaskPages";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -66,8 +68,14 @@ export default function CalendarPage() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const requestIdRef = useRef(0);
+  const hasLoadedRef = useRef(false);
+  const initialLoading = loading && !hasLoadedRef.current;
+  const savingRef = useRef(false);
+  const actionLocksRef = useRef(new Set());
 
   const loadTasks = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError("");
 
@@ -81,29 +89,27 @@ export default function CalendarPage() {
         direction: "ASC",
       });
 
-      let allTasks = [...(firstPage.content || [])];
-      const totalPages = Number(firstPage.totalPages || 0);
+      const allTasks = await fetchAllTaskPages(
+        firstPage,
+        { size: 100, sortBy: "dueDate", direction: "ASC" },
+        taskService.getTasks,
+        4
+      );
 
-      for (let page = 1; page < totalPages; page += 1) {
-        const result = await taskService.getTasks({
-          page,
-          size: 100,
-          sortBy: "dueDate",
-          direction: "ASC",
-        });
-        allTasks = allTasks.concat(result.content || []);
+      if (requestId === requestIdRef.current) {
+        setTasks(allTasks);
+        hasLoadedRef.current = true;
       }
-
-      setTasks(allTasks);
     } catch (err) {
-      setError(getApiError(err));
+      if (requestId === requestIdRef.current) setError(getApiError(err));
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     loadTasks();
+    return () => { requestIdRef.current += 1; };
   }, [loadTasks]);
 
   const calendarDays = useMemo(
@@ -152,6 +158,8 @@ export default function CalendarPage() {
   }
 
   async function saveTask(payload) {
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     setError("");
     try {
@@ -168,51 +176,62 @@ export default function CalendarPage() {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
 
   async function toggleTask(task) {
-    const nextCompleted = !task.completed;
-    const action = nextCompleted ? "complete" : "move back to pending";
-    const confirmed = await confirm({
-      title: nextCompleted ? "Complete this task?" : "Restore this task?",
-      message: `Are you sure you want to ${action} "${task.title}"?`,
-      confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
-    });
-    if (!confirmed) return;
+    const lockKey = `task-${task.id}`;
+    if (actionLocksRef.current.has(lockKey)) return;
+    actionLocksRef.current.add(lockKey);
 
-    setBusyId(task.id);
-    setError("");
     try {
+      const nextCompleted = !task.completed;
+      const action = nextCompleted ? "complete" : "move back to pending";
+      const confirmed = await confirm({
+        title: nextCompleted ? "Complete this task?" : "Restore this task?",
+        message: `Are you sure you want to ${action} "${task.title}"?`,
+        confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+      });
+      if (!confirmed) return;
+
+      setBusyId(task.id);
+      setError("");
       await taskService.setCompleted(task.id, nextCompleted);
       notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
       await loadTasks();
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      actionLocksRef.current.delete(lockKey);
       setBusyId(null);
     }
   }
 
   async function deleteTask(task) {
-    const confirmed = await confirm({
-      title: "Delete this task?",
-      message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
-      confirmLabel: "Delete task",
-      tone: "danger",
-    });
-    if (!confirmed) return;
+    const lockKey = `task-${task.id}`;
+    if (actionLocksRef.current.has(lockKey)) return;
+    actionLocksRef.current.add(lockKey);
 
-    setBusyId(task.id);
-    setError("");
     try {
+      const confirmed = await confirm({
+        title: "Delete this task?",
+        message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+        confirmLabel: "Delete task",
+        tone: "danger",
+      });
+      if (!confirmed) return;
+
+      setBusyId(task.id);
+      setError("");
       await taskService.deleteTask(task.id);
       notify("Task deleted successfully.");
       await loadTasks();
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      actionLocksRef.current.delete(lockKey);
       setBusyId(null);
     }
   }
@@ -231,19 +250,13 @@ export default function CalendarPage() {
         </button>
       </div>
 
-      {error && (
-        <div className="alert-error" role="alert">
-          <CircleAlert size={17} />
-          <span>{error}</span>
-          <button onClick={loadTasks}>Retry</button>
-        </div>
-      )}
+      <ErrorBanner message={error} onRetry={loadTasks} retrying={loading} />
 
-      <section className="calendar-panel panel">
+      <section className="calendar-panel panel" aria-busy={loading}>
         <div className="calendar-toolbar">
           <div className="calendar-month-heading">
             <h3>{MONTHS[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}</h3>
-            <span>{tasks.length} scheduled {tasks.length === 1 ? "task" : "tasks"}</span>
+            <span>{tasks.length} scheduled {tasks.length === 1 ? "task" : "tasks"}{loading && hasLoadedRef.current ? " · Updating…" : ""}</span>
           </div>
           <div className="calendar-nav">
             <button className="btn btn-quiet calendar-today" onClick={goToToday}>Today</button>
@@ -259,7 +272,7 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <div className="calendar-grid">
+        {initialLoading ? <CalendarGridSkeleton /> : <div className="calendar-grid" aria-busy={loading}>
           {WEEKDAYS.map((day) => (
             <div className="calendar-weekday" key={day}>{day}</div>
           ))}
@@ -316,7 +329,7 @@ export default function CalendarPage() {
               </button>
             );
           })}
-        </div>
+        </div>}
 
         <div className="calendar-legend">
           <span><i className="calendar-dot pending-dot" /> Pending</span>
@@ -325,7 +338,7 @@ export default function CalendarPage() {
         </div>
       </section>
 
-      <section className="panel calendar-agenda">
+      <section className="panel calendar-agenda" aria-busy={loading}>
         <div className="panel-heading">
           <div>
             <span className="eyebrow">DAILY AGENDA</span>
@@ -348,8 +361,8 @@ export default function CalendarPage() {
           </button>
         </div>
 
-        {loading ? (
-          <div className="loading-line">Loading your scheduled tasks...</div>
+        {initialLoading ? (
+          <AgendaSkeleton />
         ) : selectedTasks.length === 0 ? (
           <div className="calendar-agenda-empty">
             <div className="empty-icon"><CalendarDays size={23} /></div>
@@ -360,7 +373,8 @@ export default function CalendarPage() {
             </button>
           </div>
         ) : (
-          <div className="calendar-agenda-list">
+          <div className="calendar-agenda-list" aria-busy={loading}>
+            {loading && <div className="inline-loading-status" role="status">Refreshing scheduled tasks…</div>}
             {selectedTasks.map((task) => (
               <article className={`calendar-agenda-item ${task.completed ? "is-completed" : ""}`} key={task.id}>
                 <button

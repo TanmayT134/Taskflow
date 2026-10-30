@@ -1,10 +1,10 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     CheckCheck,
+    AlertCircle,
     ListTodo,
     Clock3,
-    AlertCircle,
     ArrowUpRight,
     Plus,
     Sparkles,
@@ -15,11 +15,14 @@ import { Link } from "react-router-dom";
 import { taskService } from "../services/taskService";
 import { getApiError } from "../services/api";
 import { greeting } from "../utils/format";
+import { fetchAllTaskPages } from "../utils/fetchAllTaskPages";
 
 import StatCard from "../components/StatCard";
 import TaskTable from "../components/TaskTable";
 import TaskModal from "../components/TaskModal";
+import { StatCardsSkeleton, TaskRowsSkeleton } from "../components/LoadingSkeletons";
 import { useFeedback } from "../context/FeedbackContext";
+import ErrorBanner from "../components/ErrorBanner";
 
 export default function Dashboard() {
     const { confirm, notify } = useFeedback();
@@ -28,6 +31,7 @@ export default function Dashboard() {
     const [allTasks, setAllTasks] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const initialLoading = loading && stats === null;
     const [error, setError] = useState("");
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -35,44 +39,52 @@ export default function Dashboard() {
 
     const [saving, setSaving] = useState(false);
     const [busyId, setBusyId] = useState(null);
+    const requestIdRef = useRef(0);
+    const savingRef = useRef(false);
+    const actionLocksRef = useRef(new Set());
 
-    // Load dashboard information from backend
+    // Load dashboard information. Priority data is collected across every page,
+    // not just the first 100 tasks, so the distribution remains accurate.
     async function loadDashboard() {
+        const requestId = ++requestIdRef.current;
         setLoading(true);
         setError("");
 
         try {
-            const [statsData, recentData, allTasksData] =
-                await Promise.all([
-                    taskService.getStats(),
+            const taskQuery = {
+                size: 100,
+                sortBy: "createdAt",
+                direction: "DESC",
+            };
+            // The first task page also supplies the five recent tasks, avoiding
+            // a second overlapping request for the same records.
+            const [statsData, firstTaskPage] = await Promise.all([
+                taskService.getStats(),
+                taskService.getTasks({ ...taskQuery, page: 0 }),
+            ]);
 
-                    taskService.getTasks({
-                        page: 0,
-                        size: 5,
-                        sortBy: "createdAt",
-                        direction: "DESC",
-                    }),
+            const completeTaskList = await fetchAllTaskPages(
+                firstTaskPage,
+                taskQuery,
+                taskService.getTasks,
+                4
+            );
 
-                    taskService.getTasks({
-                        page: 0,
-                        size: 100,
-                        sortBy: "createdAt",
-                        direction: "DESC",
-                    }),
-                ]);
-
+            // Ignore older requests that finish after a newer refresh.
+            if (requestId !== requestIdRef.current) return;
             setStats(statsData);
-            setTasks(recentData.content || []);
-            setAllTasks(allTasksData.content || []);
+            setTasks((firstTaskPage.content || []).slice(0, 5));
+            setAllTasks(completeTaskList);
         } catch (err) {
-            setError(getApiError(err));
+            if (requestId === requestIdRef.current) setError(getApiError(err));
         } finally {
-            setLoading(false);
+            if (requestId === requestIdRef.current) setLoading(false);
         }
     }
 
     useEffect(() => {
         loadDashboard();
+        return () => { requestIdRef.current += 1; };
     }, []);
 
     // Open modal for creating a task
@@ -89,6 +101,8 @@ export default function Dashboard() {
 
     // Create or update task
     async function handleSaveTask(payload) {
+        if (savingRef.current) return;
+        savingRef.current = true;
         setSaving(true);
         setError("");
 
@@ -108,80 +122,81 @@ export default function Dashboard() {
         } catch (err) {
             setError(getApiError(err));
         } finally {
+            savingRef.current = false;
             setSaving(false);
         }
     }
 
-    // Mark task completed or pending
+    // Mark task completed or pending. A ref lock prevents rapid repeated clicks
+    // before React has a chance to render the disabled state.
     async function handleToggleTask(task) {
-        const nextCompleted = !task.completed;
-        const confirmed = await confirm({
-            title: nextCompleted ? "Complete this task?" : "Restore this task?",
-            message: nextCompleted
-                ? `Mark "${task.title}" as completed?`
-                : `Move "${task.title}" back to pending?`,
-            confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
-        });
-        if (!confirmed) return;
-
-        setBusyId(task.id);
-        setError("");
+        const lockKey = `task-${task.id}`;
+        if (actionLocksRef.current.has(lockKey)) return;
+        actionLocksRef.current.add(lockKey);
 
         try {
-            await taskService.setCompleted(
-                task.id,
-                nextCompleted
-            );
-            notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
+            const nextCompleted = !task.completed;
+            const confirmed = await confirm({
+                title: nextCompleted ? "Complete this task?" : "Restore this task?",
+                message: nextCompleted
+                    ? `Mark "${task.title}" as completed?`
+                    : `Move "${task.title}" back to pending?`,
+                confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+            });
+            if (!confirmed) return;
 
+            setBusyId(task.id);
+            setError("");
+            await taskService.setCompleted(task.id, nextCompleted);
+            notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
             await loadDashboard();
         } catch (err) {
             setError(getApiError(err));
         } finally {
+            actionLocksRef.current.delete(lockKey);
             setBusyId(null);
         }
     }
 
     // Delete task
     async function handleDeleteTask(task) {
-        const confirmed = await confirm({
-            title: "Delete this task?",
-            message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
-            confirmLabel: "Delete task",
-            tone: "danger",
-        });
-
-        if (!confirmed) return;
-
-        setBusyId(task.id);
-        setError("");
+        const lockKey = `task-${task.id}`;
+        if (actionLocksRef.current.has(lockKey)) return;
+        actionLocksRef.current.add(lockKey);
 
         try {
+            const confirmed = await confirm({
+                title: "Delete this task?",
+                message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+                confirmLabel: "Delete task",
+                tone: "danger",
+            });
+            if (!confirmed) return;
+
+            setBusyId(task.id);
+            setError("");
             await taskService.deleteTask(task.id);
             notify("Task deleted successfully.");
-
             await loadDashboard();
         } catch (err) {
             setError(getApiError(err));
         } finally {
+            actionLocksRef.current.delete(lockKey);
             setBusyId(null);
         }
     }
 
     // Calculate priority distribution from backend task data
-    const priorityCounts = {
-        HIGH: allTasks.filter(
-            (task) => task.priority === "HIGH"
-        ).length,
-
-        MEDIUM: allTasks.filter(
-            (task) => task.priority === "MEDIUM"
-        ).length,
-
-        LOW: allTasks.filter(
-            (task) => task.priority === "LOW"
-        ).length,
-    };
+    // One pass over the collection is cheaper than three separate filters.
+    const priorityCounts = allTasks.reduce(
+        (counts, task) => {
+            if (task.priority === "HIGH") counts.HIGH += 1;
+            else if (task.priority === "MEDIUM") counts.MEDIUM += 1;
+            else if (task.priority === "LOW") counts.LOW += 1;
+            return counts;
+        },
+        { HIGH: 0, MEDIUM: 0, LOW: 0 }
+    );
 
     const totalPriorityTasks =
         priorityCounts.HIGH +
@@ -207,7 +222,7 @@ export default function Dashboard() {
     ];
 
     return (
-        <div className="dashboard-page">
+        <div className="dashboard-page" aria-busy={loading}>
 
             {/* Welcome section */}
             <div className="welcome-row">
@@ -234,16 +249,7 @@ export default function Dashboard() {
             </div>
 
             {/* Error message */}
-            {error && (
-                <div className="alert-error">
-                    <AlertCircle size={17} />
-                    <span>{error}</span>
-
-                    <button onClick={loadDashboard}>
-                        Retry
-                    </button>
-                </div>
-            )}
+            <ErrorBanner message={error} onRetry={loadDashboard} retrying={loading} />
 
             {/* Statistics */}
             <div className="section-title">
@@ -258,39 +264,14 @@ export default function Dashboard() {
                 </span>
             </div>
 
-            <div className="stats-grid">
-                <StatCard
-                    label="Total tasks"
-                    value={loading ? "…" : stats?.totalTasks}
-                    detail="Across your workspace"
-                    icon={ListTodo}
-                    tone="blue"
-                />
-
-                <StatCard
-                    label="Completed"
-                    value={loading ? "…" : stats?.completedTasks}
-                    detail="Tasks you’ve finished"
-                    icon={CheckCheck}
-                    tone="green"
-                />
-
-                <StatCard
-                    label="In progress"
-                    value={loading ? "…" : stats?.pendingTasks}
-                    detail="Still waiting for you"
-                    icon={Clock3}
-                    tone="violet"
-                />
-
-                <StatCard
-                    label="Overdue"
-                    value={loading ? "…" : stats?.overdueTasks}
-                    detail="Past their due date"
-                    icon={AlertCircle}
-                    tone="orange"
-                />
-            </div>
+            {initialLoading ? <StatCardsSkeleton /> : (
+                <div className="stats-grid" aria-busy={loading}>
+                    <StatCard label="Total tasks" value={stats?.totalTasks ?? 0} detail="Across your workspace" icon={ListTodo} tone="blue" />
+                    <StatCard label="Completed" value={stats?.completedTasks ?? 0} detail="Tasks you’ve finished" icon={CheckCheck} tone="green" />
+                    <StatCard label="In progress" value={stats?.pendingTasks ?? 0} detail="Still waiting for you" icon={Clock3} tone="violet" />
+                    <StatCard label="Overdue" value={stats?.overdueTasks ?? 0} detail="Past their due date" icon={AlertCircle} tone="orange" />
+                </div>
+            )}
 
             {/* Dashboard insights */}
             <div className="dashboard-lower">
@@ -308,27 +289,19 @@ export default function Dashboard() {
                         </span>
                     </div>
 
-                    <div className="progress-number">
-                        {loading
-                            ? "—"
-                            : `${Number(
-                                stats?.completionPercentage || 0
-                            ).toFixed(1)}%`}
-                    </div>
-
-                    <div className="progress-track">
-                        <div
-                            style={{
-                                width: `${Math.min(
-                                    100,
-                                    Math.max(
-                                        0,
-                                        Number(stats?.completionPercentage || 0)
-                                    )
-                                )}%`,
-                            }}
-                        />
-                    </div>
+                    {initialLoading ? (
+                        <div className="skeleton-progress-block" role="status" aria-label="Loading completion progress">
+                            <span className="skeleton-block skeleton-progress-value" />
+                            <span className="skeleton-block skeleton-progress-track" />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="progress-number">{`${Number(stats?.completionPercentage || 0).toFixed(1)}%`}</div>
+                            <div className="progress-track">
+                                <div style={{ width: `${Math.min(100, Math.max(0, Number(stats?.completionPercentage || 0)))}%` }} />
+                            </div>
+                        </>
+                    )}
 
                     <div className="progress-foot">
                         <span>
@@ -379,9 +352,11 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {loading ? (
-                    <div className="loading-line">
-                        Loading priority data…
+                {initialLoading ? (
+                    <div className="skeleton-chart" role="status" aria-label="Loading priority distribution">
+                        <span className="skeleton-block skeleton-chart-line" />
+                        <span className="skeleton-block skeleton-chart-line medium" />
+                        <span className="skeleton-block skeleton-chart-line short" />
                     </div>
                 ) : totalPriorityTasks === 0 ? (
                     <div className="priority-empty">
@@ -424,7 +399,7 @@ export default function Dashboard() {
                         })}
 
                         <div className="priority-chart-footer">
-                            Based on {totalPriorityTasks} loaded tasks
+                            Based on {totalPriorityTasks} tasks
                         </div>
                     </div>
                 )}
@@ -444,10 +419,8 @@ export default function Dashboard() {
                     </Link>
                 </div>
 
-                {loading ? (
-                    <div className="loading-line">
-                        Loading your tasks…
-                    </div>
+                {initialLoading ? (
+                    <TaskRowsSkeleton rows={4} />
                 ) : (
                     <TaskTable
                         tasks={tasks}

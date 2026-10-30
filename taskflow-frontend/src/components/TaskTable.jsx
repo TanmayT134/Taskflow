@@ -60,6 +60,7 @@ export default function TaskTable({
           key={task.id}
         >
           <button
+            type="button"
             className={`check-button ${task.completed ? "checked" : ""}`}
             onClick={() => onToggle(task)}
             aria-label={task.completed ? "Move task back to pending" : "Mark task completed"}

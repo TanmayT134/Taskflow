@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Plus,
   Search,
@@ -6,7 +6,6 @@ import {
   SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
-  AlertCircle,
   RefreshCw,
 } from "lucide-react";
 
@@ -14,8 +13,10 @@ import { taskService } from "../services/taskService";
 import { getApiError } from "../services/api";
 import TaskTable from "../components/TaskTable";
 import TaskModal from "../components/TaskModal";
+import { TaskRowsSkeleton } from "../components/LoadingSkeletons";
 import { usePreferences } from "../context/PreferencesContext";
 import { useFeedback } from "../context/FeedbackContext";
+import ErrorBanner from "../components/ErrorBanner";
 
 export default function TasksPage({ mode = "all" }) {
   const { preferences } = usePreferences();
@@ -41,6 +42,11 @@ export default function TasksPage({ mode = "all" }) {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const requestIdRef = useRef(0);
+  const hasLoadedRef = useRef(false);
+  const initialLoading = loading && !hasLoadedRef.current;
+  const savingRef = useRef(false);
+  const actionLocksRef = useRef(new Set());
 
   const isPendingPage = mode === "pending";
   const isCompletedPage = mode === "completed";
@@ -53,6 +59,7 @@ export default function TasksPage({ mode = "all" }) {
       : "All tasks";
 
   const load = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError("");
 
@@ -73,11 +80,14 @@ export default function TasksPage({ mode = "all" }) {
       }
 
       const result = await taskService.getTasks(params);
-      setData(result);
+      if (requestId === requestIdRef.current) {
+        setData(result);
+        hasLoadedRef.current = true;
+      }
     } catch (err) {
-      setError(getApiError(err));
+      if (requestId === requestIdRef.current) setError(getApiError(err));
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, [
     page,
@@ -96,6 +106,10 @@ export default function TasksPage({ mode = "all" }) {
     return () => clearTimeout(timer);
   }, [load]);
 
+  useEffect(() => () => {
+    requestIdRef.current += 1;
+  }, []);
+
   function resetPage() {
     setPage(0);
   }
@@ -112,6 +126,8 @@ export default function TasksPage({ mode = "all" }) {
   }
 
   async function saveTask(payload) {
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     setError("");
 
@@ -134,34 +150,36 @@ export default function TasksPage({ mode = "all" }) {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }
 
   async function toggleTask(task) {
-    const nextCompleted = !task.completed;
-    const action = nextCompleted
-      ? "mark this task as completed"
-      : "move this task back to pending";
-
-    const confirmed = await confirm({
-      title: nextCompleted ? "Complete this task?" : "Restore this task?",
-      message: `Are you sure you want to ${action}? "${task.title}"`,
-      confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
-      tone: "default",
-    });
-
-    if (!confirmed) return;
-
-    setBusyId(task.id);
-    setError("");
+    const lockKey = `task-${task.id}`;
+    if (actionLocksRef.current.has(lockKey)) return;
+    actionLocksRef.current.add(lockKey);
 
     try {
+      const nextCompleted = !task.completed;
+      const action = nextCompleted
+        ? "mark this task as completed"
+        : "move this task back to pending";
+
+      const confirmed = await confirm({
+        title: nextCompleted ? "Complete this task?" : "Restore this task?",
+        message: `Are you sure you want to ${action}? "${task.title}"`,
+        confirmLabel: nextCompleted ? "Mark complete" : "Move to pending",
+        tone: "default",
+      });
+      if (!confirmed) return;
+
+      setBusyId(task.id);
+      setError("");
       await taskService.setCompleted(task.id, nextCompleted);
       notify(nextCompleted ? "Task marked as completed." : "Task moved back to pending.");
 
-      // If the last row on a later page moves to another status, step back
-      // so the user does not land on an empty out-of-range page.
+      // If the last row on a later page moves to another status, step back.
       if (data.content.length === 1 && page > 0) {
         setPage((current) => Math.max(0, current - 1));
       } else {
@@ -170,24 +188,27 @@ export default function TasksPage({ mode = "all" }) {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      actionLocksRef.current.delete(lockKey);
       setBusyId(null);
     }
   }
 
   async function deleteTask(task) {
-    const confirmed = await confirm({
-      title: "Delete this task?",
-      message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
-      confirmLabel: "Delete task",
-      tone: "danger",
-    });
-
-    if (!confirmed) return;
-
-    setBusyId(task.id);
-    setError("");
+    const lockKey = `task-${task.id}`;
+    if (actionLocksRef.current.has(lockKey)) return;
+    actionLocksRef.current.add(lockKey);
 
     try {
+      const confirmed = await confirm({
+        title: "Delete this task?",
+        message: `"${task.title}" will be permanently deleted. This action cannot be undone.`,
+        confirmLabel: "Delete task",
+        tone: "danger",
+      });
+      if (!confirmed) return;
+
+      setBusyId(task.id);
+      setError("");
       await taskService.deleteTask(task.id);
       notify("Task deleted successfully.");
 
@@ -199,6 +220,7 @@ export default function TasksPage({ mode = "all" }) {
     } catch (err) {
       setError(getApiError(err));
     } finally {
+      actionLocksRef.current.delete(lockKey);
       setBusyId(null);
     }
   }
@@ -339,22 +361,14 @@ export default function TasksPage({ mode = "all" }) {
         )}
       </div>
 
-      {error && (
-        <div className="alert-error" role="alert">
-          <AlertCircle size={17} />
-          <span>{error}</span>
-          <button onClick={load}>Retry</button>
-        </div>
-      )}
+      <ErrorBanner message={error} onRetry={load} retrying={loading} />
 
-      <section className="panel task-panel">
+      <section className="panel task-panel" aria-busy={loading}>
         <div className="panel-heading">
           <div>
             <h3>{title}</h3>
             <p>
-              {loading
-                ? "Loading tasks..."
-                : `${data.totalElements || 0} tasks found`}
+              {loading && hasLoadedRef.current ? "Updating results…" : hasLoadedRef.current ? `${data.totalElements || 0} tasks found` : "Loading tasks…"}
             </p>
           </div>
           <button
@@ -363,15 +377,18 @@ export default function TasksPage({ mode = "all" }) {
             title="Refresh tasks"
             aria-label="Refresh tasks"
             disabled={loading}
+            aria-busy={loading}
           >
-            <RefreshCw size={17} />
+            <RefreshCw size={17} className={loading && hasLoadedRef.current ? "refresh-spinning" : ""} />
           </button>
         </div>
 
-        {loading ? (
-          <div className="loading-line">Fetching tasks from your workspace...</div>
+        {initialLoading ? (
+          <TaskRowsSkeleton rows={pageSize > 10 ? 7 : pageSize} />
         ) : (
-          <TaskTable
+          <>
+            {loading && <div className="inline-loading-status" role="status">Updating task list…</div>}
+            <TaskTable
             tasks={data.content || []}
             onToggle={toggleTask}
             onEdit={openEditModal}
@@ -382,6 +399,7 @@ export default function TasksPage({ mode = "all" }) {
             emptyDescription={emptyState.description}
             showEmptyCreate={canCreateTask && !hasFilters}
           />
+          </>
         )}
 
         <div className="pagination pagination-enhanced">
