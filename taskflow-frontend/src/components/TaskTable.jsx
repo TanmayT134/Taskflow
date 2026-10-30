@@ -1,4 +1,3 @@
-
 import {
   Check,
   Trash2,
@@ -12,11 +11,7 @@ import { formatDate, isOverdue } from "../utils/format";
 
 function Priority({ value }) {
   return (
-    <span
-      className={`priority priority-${(
-        value || "medium"
-      ).toLowerCase()}`}
-    >
+    <span className={`priority priority-${(value || "medium").toLowerCase()}`}>
       <i />
       {value || "MEDIUM"}
     </span>
@@ -30,6 +25,9 @@ export default function TaskTable({
   onDelete,
   onCreate,
   busyId,
+  emptyTitle = "No tasks found",
+  emptyDescription = "There are no tasks matching your current selection.",
+  showEmptyCreate = Boolean(onCreate),
 }) {
   if (!tasks.length) {
     return (
@@ -37,15 +35,10 @@ export default function TaskTable({
         <div className="empty-icon">
           <ListTodo size={25} />
         </div>
+        <h3>{emptyTitle}</h3>
+        <p>{emptyDescription}</p>
 
-        <h3>No tasks found</h3>
-
-        <p>
-          There are no tasks matching your current selection.
-          Try changing your filters or create a new task.
-        </p>
-
-        {onCreate && (
+        {showEmptyCreate && onCreate && (
           <button
             className="btn btn-primary empty-create-btn"
             onClick={onCreate}
@@ -62,21 +55,14 @@ export default function TaskTable({
     <div className="task-list">
       {tasks.map((task) => (
         <article
-          className={`task-row ${
-            task.completed ? "task-done" : ""
-          }`}
+          className={`task-row ${task.completed ? "task-done" : ""}`}
           key={task.id}
         >
           <button
-            className={`check-button ${
-              task.completed ? "checked" : ""
-            }`}
+            className={`check-button ${task.completed ? "checked" : ""}`}
             onClick={() => onToggle(task)}
-            aria-label={
-              task.completed
-                ? "Mark pending"
-                : "Mark completed"
-            }
+            aria-label={task.completed ? "Move task back to pending" : "Mark task completed"}
+            title={task.completed ? "Move back to pending" : "Mark as completed"}
             disabled={busyId === task.id}
           >
             {task.completed && <Check size={14} />}
@@ -88,21 +74,11 @@ export default function TaskTable({
               <Priority value={task.priority} />
             </div>
 
-            <p>
-              {task.description || "No description added."}
-            </p>
+            <p>{task.description || "No description added."}</p>
 
-            <div
-              className={`task-date ${
-                isOverdue(task) ? "overdue" : ""
-              }`}
-            >
+            <div className={`task-date ${isOverdue(task) ? "overdue" : ""}`}>
               <CalendarDays size={14} />
-
-              {isOverdue(task)
-                ? "Overdue · "
-                : "Due · "}
-
+              {isOverdue(task) ? "Overdue · " : "Due · "}
               {formatDate(task.dueDate)}
             </div>
           </div>
@@ -112,15 +88,16 @@ export default function TaskTable({
               className="icon-button"
               onClick={() => onEdit(task)}
               title="Edit task"
+              aria-label={`Edit ${task.title}`}
               disabled={busyId === task.id}
             >
               <Pencil size={16} />
             </button>
-
             <button
               className="icon-button danger-hover"
               onClick={() => onDelete(task)}
               title="Delete task"
+              aria-label={`Delete ${task.title}`}
               disabled={busyId === task.id}
             >
               <Trash2 size={16} />
