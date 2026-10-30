@@ -1,3 +1,13 @@
+<p align="center">
+  <img
+    src="assets/banner/banner.png"
+    alt="Taskflow - Full Stack Task Management System"
+    width="100%"
+  />
+</p>
+
+---
+
 # 🚀 Taskflow — Full-Stack Task Management System
 
 <p align="center">
