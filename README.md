@@ -1,238 +1,202 @@
-```{=html}
+# 🚀 Taskflow – Full-Stack Task Management System
+
 <p align="center">
-```
-`<img src="assets/banner/banner.png" alt="Taskflow - Full Stack Task Management System" width="100%" />`{=html}
-```{=html}
+  <img src="assets/banner/banner.png" alt="Taskflow Banner" width="100%" />
 </p>
-```
-```{=html}
-<h1 align="center">
-```
-Taskflow -- Full-Stack Task Management System
-```{=html}
-</h1>
-```
-```{=html}
+
 <p align="center">
-```
-`<img src="assets/GIF/GIF.gif" width="100%" alt="Taskflow Application Demo" />`{=html}
-```{=html}
+  <img src="assets/GIF/GIF.gif" alt="Taskflow Application Demo" width="100%" />
 </p>
-```
-```{=html}
+
 <p align="center">
-```
-A full-stack task management application built with
-`<strong>`{=html}React`</strong>`{=html}, `<strong>`{=html}Spring
-Boot`</strong>`{=html}, and `<strong>`{=html}MySQL`</strong>`{=html}.
-`<br />`{=html} Organize tasks, manage priorities, track productivity,
-and receive automated email reminders.
-```{=html}
+  A modern full-stack task management application built with <strong>React, Spring Boot, and MySQL</strong>.
+  <br />
+  Organize tasks, manage priorities, monitor productivity, and stay on top of deadlines with automated email reminders.
 </p>
-```
-```{=html}
+
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21" />`{=html}
-`<img src="https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />`{=html}
-`<img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />`{=html}
-`<img src="https://img.shields.io/badge/MySQL-8-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL 8" />`{=html}
-```{=html}
+  <img src="https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21" />
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React 18" />
+  <img src="https://img.shields.io/badge/MySQL-8-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL 8" />
 </p>
-```
-```{=html}
+
 <p align="center">
-```
-`<img src="https://img.shields.io/badge/Authentication-JWT-blue?style=flat-square" alt="JWT Authentication" />`{=html}
-`<img src="https://img.shields.io/badge/API-REST-orange?style=flat-square" alt="REST API" />`{=html}
-`<img src="https://img.shields.io/badge/Email-Scheduled%20Reminders-success?style=flat-square" alt="Scheduled email reminders" />`{=html}
-`<img src="https://img.shields.io/badge/Status-Local%20Development-informational?style=flat-square" alt="Local development" />`{=html}
-```{=html}
+  <img src="https://img.shields.io/badge/Authentication-JWT-blue?style=flat-square" alt="JWT Authentication" />
+  <img src="https://img.shields.io/badge/API-REST-orange?style=flat-square" alt="REST API" />
+  <img src="https://img.shields.io/badge/Email-Automated%20Reminders-success?style=flat-square" alt="Automated Email Reminders" />
+  <img src="https://img.shields.io/badge/Status-Active%20Development-informational?style=flat-square" alt="Project Status" />
 </p>
-```
 
-------------------------------------------------------------------------
+---
 
-## Overview
+## 📖 Overview
 
-**Taskflow** is a full-stack task management application designed to
-help users organize their work and monitor their productivity from a
-single interface.
+**Taskflow** is a full-stack task management application designed to simplify everyday task organization and productivity tracking.
 
-The application combines a React frontend with a Spring Boot REST API
-and a MySQL database. Users can register and log in, manage their own
-tasks, organize work by priority and due date, review progress through a
-dashboard and calendar, and configure automated email reminders.
+Built with a React frontend, Spring Boot REST API, and MySQL database, Taskflow provides an integrated platform where users can manage tasks, organize priorities, track deadlines, and monitor their progress.
 
-The backend follows a layered architecture using controllers, services,
-repositories, DTOs, and JPA entities. Spring Security and JWT
-authentication protect private endpoints and ensure that task and
-reminder-preference data is scoped to the authenticated user.
+The application features JWT-based authentication, user-specific data management, an interactive dashboard, calendar-based task organization, and configurable automated email reminders.
 
-> **Project status:** Taskflow is developed and run locally. Public
-> deployment is not currently configured.
+The backend follows a layered architecture with clear separation of controllers, services, repositories, DTOs, and entities, while the frontend uses reusable React components and centralized application state.
 
-## Features
+## ✨ Key Features
 
-### Authentication and account security
+### 🔐 Authentication & Security
+- User registration and login.
+- JWT-based authentication using Spring Security.
+- Stateless authentication with Bearer tokens.
+- BCrypt password hashing.
+- Protected frontend routes.
+- User-specific task and reminder-preference management.
+- Isolation of data between authenticated users.
 
--   User registration and login.
--   JWT-based authentication with stateless Spring Security.
--   BCrypt password hashing.
--   Protected application routes.
--   Authenticated API requests using Bearer tokens.
--   User-specific task and reminder-preference data.
+### 📊 Interactive Dashboard
+- Overview of total, completed, pending, and overdue tasks.
+- Task completion percentage.
+- High, medium, and low priority distribution.
+- Upcoming tasks based on due dates.
+- Recently created tasks.
+- Dynamically loaded dashboard statistics.
+
+### 📝 Task Management
+- Create, view, update, and delete tasks.
+- Mark tasks as completed or reopen them.
+- Assign HIGH, MEDIUM, or LOW priority.
+- Set task due dates.
+- Search by task title and description.
+- Filter by priority and completion status.
+- Sort tasks using supported fields.
+- Paginated task listing.
+- User-level task data isolation.
+
+### 📅 Calendar
+- Calendar-based task visualization.
+- Organize tasks according to due dates.
+- Navigate between calendar dates.
+- Create tasks with the selected date automatically prefilled.
+- View pending and completed tasks.
+
+### 🔔 Automated Email Reminders
+- One-day-before due-date reminders.
+- Due-date reminders.
+- Daily overdue reminders until task completion, when enabled.
+- Individual reminder preferences for each account.
+- Configurable reminder time and time zone.
+- Automatic exclusion of completed tasks.
+- Database-backed reminder logs to reduce duplicate notifications.
+- Gmail SMTP integration.
+
+### ⚙️ Settings & Preferences
+- Light and dark appearance preferences.
+- Task display and sorting preferences.
+- Default task priority.
+- Export task records as CSV.
+- Configure email reminder preferences.
+- Save reminder settings per account.
+
+### 🎨 User Experience
+- Modern, responsive application interface.
+- Reusable React components.
+- Interactive sidebar navigation.
+- Loading, error, and success feedback states.
+- Confirmation before important task actions.
+- Responsive layouts for desktop and mobile screens.
+- Route-level error handling and accessible navigation.
+
+---
+
+## 🖥️ Application Preview
 
 ### Dashboard
 
--   Total, completed, pending, and overdue task statistics.
--   Task completion percentage.
--   High, medium, and low priority breakdown.
--   Upcoming tasks.
--   Recently created tasks.
+<p align="center">
+  <img src="assets/screenshots/Dashboard.png" width="100%" alt="Taskflow Dashboard" />
+  <br />
+  <em>Monitor task statistics, productivity, upcoming tasks, and recent activity.</em>
+</p>
 
-### Task management
+### Task Management
 
--   Create, view, update, and delete tasks.
--   Mark tasks as completed or reopen them.
--   Set task priority and due dates.
--   Search by task title and description.
--   Filter by priority and completion status.
--   Sort and paginate task records.
--   User-level data isolation.
+| All Tasks | Create / Edit Task |
+|:---:|:---:|
+| <img src="assets/screenshots/All_Tasks.png" width="100%" alt="All Tasks" /> | <img src="assets/screenshots/Task_Modal.png" width="100%" alt="Task Creation Modal" /> |
 
 ### Calendar
 
--   View tasks by due date.
--   Navigate calendar dates.
--   Create a task with the selected calendar date prefilled.
--   View pending and completed tasks.
-
-### Email reminders
-
--   Automated email reminders for tasks with due dates.
--   One-day-before reminders.
--   Due-date reminders.
--   Daily overdue reminders until the task is completed, when enabled.
--   Per-account reminder preferences.
--   Configurable reminder time and time zone.
--   Completed tasks are excluded from reminders.
--   Database-backed reminder logs help prevent duplicate sends.
-
-The default reminder schedule is 9:00 AM in the `Asia/Kolkata` time
-zone. Users can change supported reminder preferences in Settings.
-
-### Settings and usability
-
--   Theme and task display preferences.
--   Default task priority and sorting preferences.
--   Export task records as CSV.
--   Configure email reminder preferences.
--   Responsive layout for desktop and mobile screens.
--   Loading, error, and success feedback states.
--   Accessible navigation and route-level error handling.
-
-------------------------------------------------------------------------
-
-## Application Screenshots
-
-The following images show the main Taskflow interfaces.
-
-```{=html}
 <p align="center">
-```
-`<img src="assets/screenshots/Dashboard.png" width="100%" alt="Taskflow Dashboard" />`{=html}
-`<br />`{=html} `<strong>`{=html}Dashboard`</strong>`{=html}
-```{=html}
+  <img src="assets/screenshots/Calendar.png" width="100%" alt="Taskflow Calendar" />
+  <br />
+  <em>Visualize and organize tasks according to their due dates.</em>
 </p>
-```
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                                        All Tasks                                                                           Create / Edit Task
-  -------------------------------------------------------------------------------------- ----------------------------------------------------------------------------------------
-   `<img src="assets/screenshots/All_Tasks.png" width="100%" alt="All Tasks" />`{=html}   `<img src="assets/screenshots/Task_Modal.png" width="100%" alt="Task Modal" />`{=html}
 
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+### Settings
 
-```{=html}
 <p align="center">
-```
-`<img src="assets/screenshots/Calendar.png" width="100%" alt="Taskflow Calendar" />`{=html}
-`<br />`{=html} `<strong>`{=html}Calendar`</strong>`{=html}
-```{=html}
+  <img src="assets/screenshots/Settings.png" width="100%" alt="Taskflow Settings" />
+  <br />
+  <em>Manage application preferences and automated reminder settings.</em>
 </p>
-```
-```{=html}
-<p align="center">
-```
-`<img src="assets/screenshots/Settings.png" width="100%" alt="Taskflow Settings" />`{=html}
-`<br />`{=html} `<strong>`{=html}Settings and
-Preferences`</strong>`{=html}
-```{=html}
-</p>
-```
 
-------------------------------------------------------------------------
+---
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Frontend
-
--   React 18
--   JavaScript
--   Vite
--   React Router
--   Axios
--   Lucide React
--   CSS
+| Technology | Purpose |
+|---|---|
+| React 18 | Component-based UI development |
+| JavaScript | Application logic |
+| Vite | Development server and build tooling |
+| React Router | Client-side navigation |
+| Axios | HTTP communication with REST APIs |
+| Lucide React | Interface icons |
+| CSS | Responsive styling and UI design |
 
 ### Backend
+| Technology | Purpose |
+|---|---|
+| Java 21 | Backend programming language |
+| Spring Boot 4.x | Backend application framework |
+| Spring Web | REST API development |
+| Spring Security | Authentication and authorization |
+| Spring Data JPA | Database access and persistence |
+| Hibernate | ORM implementation |
+| Bean Validation | Request validation |
+| Spring Boot Mail | Email notifications |
+| Springdoc OpenAPI | API documentation |
+| JJWT | JWT creation and validation |
+| Maven | Dependency and build management |
 
--   Java 21
--   Spring Boot 4.x
--   Spring Web
--   Spring Security
--   Spring Data JPA
--   Hibernate
--   Bean Validation
--   Spring Boot Mail
--   Springdoc OpenAPI
--   Maven
--   JJWT
+### Database & Tools
+| Technology | Purpose |
+|---|---|
+| MySQL 8 | Relational database |
+| Git & GitHub | Version control and source management |
+| Postman | REST API testing |
+| Eclipse IDE | Backend development |
+| Visual Studio Code | Frontend development |
 
-### Database
+---
 
--   MySQL 8
+## 🏗️ Application Architecture
 
-### Development tools
+Taskflow follows a client-server architecture in which the React frontend communicates with the Spring Boot backend through RESTful APIs.
 
--   Git and GitHub
--   Postman
--   Eclipse IDE
--   Visual Studio Code
-
-------------------------------------------------------------------------
-
-## Architecture
-
-Taskflow uses a client-server architecture. The React application
-communicates with the Spring Boot backend through REST APIs. The backend
-authenticates requests, applies business rules, and accesses MySQL
-through Spring Data JPA.
-
-``` text
+```text
 ┌───────────────────────────────────────────┐
 │              React Frontend               │
 │                                           │
 │  Dashboard | Tasks | Calendar | Settings  │
-│  Auth Context | Protected Routes          │
+│  Authentication | Protected Routes       │
 └─────────────────────┬─────────────────────┘
                       │
-                      │ HTTP / JSON / Bearer JWT
+                      │ HTTP / JSON / JWT
                       ▼
 ┌───────────────────────────────────────────┐
 │             Spring Boot Backend           │
 │                                           │
-│  Security & JWT Filter                    │
+│  Spring Security & JWT Filter             │
 │  REST Controllers                         │
 │  Service Layer                            │
 │  Repository Layer                         │
@@ -243,44 +207,45 @@ through Spring Data JPA.
                       │ JPA / Hibernate
                       ▼
 ┌───────────────────────────────────────────┐
-│                MySQL                      │
+│                 MySQL                      │
 │                                           │
-│  Users | Tasks | Reminder Preferences     │
-│  Reminder Logs                            │
+│  Users | Tasks                            │
+│  Reminder Preferences | Reminder Logs     │
 └───────────────────────────────────────────┘
 ```
 
-### Authentication flow
+### Backend Request Flow
 
-1.  A user registers or logs in through the frontend.
-2.  The backend validates the credentials.
-3.  On successful login, the backend returns a JWT access token and user
-    information.
-4.  The frontend stores the session information in browser
-    `sessionStorage`.
-5.  Axios attaches the token to protected API requests using the
-    `Authorization: Bearer` header.
-6.  Spring Security validates the token and establishes the
-    authenticated user context.
-7.  Backend task and preference operations are scoped to that user.
+1. The frontend sends an HTTP request to the Spring Boot REST API.
+2. Spring Security processes the request and validates the JWT for protected endpoints.
+3. The controller receives the request and delegates processing to the service layer.
+4. The service layer applies business logic and user-specific access restrictions.
+5. Spring Data JPA communicates with MySQL through repositories.
+6. The backend returns a structured JSON response to the frontend.
 
-### Reminder workflow
+### Authentication Workflow
 
-1.  The scheduler checks for eligible reminders at the configured
-    schedule.
-2.  It loads enabled reminder preferences and identifies tasks due
-    tomorrow, due today, or overdue.
-3.  The reminder processor checks task status and claims a reminder
-    record.
-4.  The email service sends the reminder through Gmail SMTP.
-5.  The reminder log records the send result to help avoid duplicate
-    processing.
+1. A user registers or logs in through the React application.
+2. The backend validates the submitted credentials.
+3. On successful authentication, the backend generates and returns a JWT access token.
+4. The frontend maintains the authenticated session using browser `sessionStorage`.
+5. Axios automatically attaches the Bearer token to protected API requests.
+6. Spring Security validates the token and establishes the authenticated user context.
+7. Task and reminder-preference operations are restricted to the authenticated account.
 
-------------------------------------------------------------------------
+### Automated Reminder Workflow
 
-## Project Structure
+1. The scheduled reminder service runs according to the configured schedule.
+2. It retrieves enabled reminder preferences and identifies eligible tasks.
+3. The reminder processor checks task status and claims the corresponding reminder record.
+4. The email service sends the notification through Gmail SMTP.
+5. The database records the reminder processing result to help prevent duplicate sends.
 
-``` text
+---
+
+## 📂 Project Structure
+
+```text
 Taskflow/
 │
 ├── taskflow-frontend/
@@ -293,6 +258,7 @@ Taskflow/
 │   │   ├── utils/
 │   │   ├── App.jsx
 │   │   └── styles.css
+│   │
 │   ├── .env.example
 │   ├── package.json
 │   └── vite.config.js
@@ -313,6 +279,7 @@ Taskflow/
 │   │   │   │   └── service/
 │   │   │   └── resources/
 │   │   └── test/
+│   │
 │   └── pom.xml
 │
 ├── assets/
@@ -323,45 +290,46 @@ Taskflow/
 └── README.md
 ```
 
-------------------------------------------------------------------------
+---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+Follow these instructions to set up and run Taskflow locally.
 
-Install the following:
+### 1. Prerequisites
 
--   JDK 21
--   Node.js and npm
--   MySQL 8
--   Git
--   Maven, if you are not using the Maven Wrapper
+Ensure the following tools are installed:
 
-### 1. Clone the repository
+- JDK 21
+- Node.js and npm
+- MySQL 8
+- Git
+- Maven (if not using the Maven Wrapper)
 
-``` bash
+### 2. Clone the Repository
+
+```bash
 git clone https://github.com/TanmayT134/Taskflow.git
 cd Taskflow
 ```
 
-### 2. Create the database
+### 3. Configure the MySQL Database
 
-Start MySQL and create the database:
+Start your MySQL server and create the database:
 
-``` sql
+```sql
 CREATE DATABASE taskflow_db;
 ```
 
-The backend uses environment variables for database connection details.
+### 4. Configure Backend Environment Variables
 
-### 3. Configure backend environment variables
+The backend requires database, JWT, and Gmail SMTP configuration.
 
-Set the following variables before starting the backend. Replace the
-example values with your own local configuration.
+Set the following variables using your own local credentials.
 
-**Windows PowerShell:**
+**Windows PowerShell**
 
-``` powershell
+```powershell
 $env:DB_URL="jdbc:mysql://localhost:3306/taskflow_db?createDatabaseIfNotExist=true"
 $env:DB_USERNAME="root"
 $env:DB_PASSWORD="YOUR_MYSQL_PASSWORD"
@@ -375,9 +343,9 @@ $env:MAIL_PASSWORD="YOUR_GMAIL_APP_PASSWORD"
 $env:APP_FRONTEND_URL="http://localhost:5173"
 ```
 
-**Linux / macOS:**
+**Linux / macOS**
 
-``` bash
+```bash
 export DB_URL="jdbc:mysql://localhost:3306/taskflow_db?createDatabaseIfNotExist=true"
 export DB_USERNAME="root"
 export DB_PASSWORD="YOUR_MYSQL_PASSWORD"
@@ -391,258 +359,221 @@ export MAIL_PASSWORD="YOUR_GMAIL_APP_PASSWORD"
 export APP_FRONTEND_URL="http://localhost:5173"
 ```
 
-**Configuration notes:** - `JWT_SECRET` must be a sufficiently strong
-Base64-encoded secret compatible with the configured JJWT signing
-algorithm. Generate your own secret; never use a sample or commit it. -
-`JWT_EXPIRATION_MS` is optional and defaults to `86400000` milliseconds
-(24 hours). - Gmail SMTP uses an App Password when 2-Step Verification
-is enabled. Do not use your normal Gmail account password. -
-`APP_FRONTEND_URL` is used to construct the link in reminder emails. -
-These environment variables must be available to the process that starts
-Spring Boot. IDE launch configurations may need their own
-environment-variable entries.
+**Configuration notes:**
 
-### 4. Start the Spring Boot backend
+- Generate your own strong Base64-encoded JWT secret compatible with the configured signing algorithm.
+- Never commit actual passwords, JWT secrets, or other credentials to GitHub.
+- `JWT_EXPIRATION_MS` represents the token lifetime in milliseconds; the documented default is 24 hours.
+- Gmail SMTP requires an App Password when using a Gmail account with 2-Step Verification enabled. Do not use your regular Gmail password.
+- `APP_FRONTEND_URL` determines the frontend link included in reminder emails.
+- Ensure environment variables are available to the process launching Spring Boot. IDE run configurations may need separate environment-variable entries.
 
-Open a terminal:
+### 5. Run the Spring Boot Backend
 
-``` bash
+Open a terminal and navigate to the backend directory:
+
+```bash
 cd taskflow-backend
 ```
 
-Run with the Maven Wrapper, if available:
+Run using the Maven Wrapper, if included in the repository.
 
 **Windows:**
 
-``` powershell
+```powershell
 .\mvnw.cmd spring-boot:run
 ```
 
 **Linux / macOS:**
 
-``` bash
+```bash
 ./mvnw spring-boot:run
 ```
 
 Alternatively, use installed Maven:
 
-``` bash
+```bash
 mvn spring-boot:run
 ```
 
-The backend runs at:
+The backend starts at:
 
-``` text
+```text
 http://localhost:8080
 ```
 
-### 5. Configure and start the frontend
+### 6. Configure and Run the React Frontend
 
-Open a second terminal:
+Open another terminal:
 
-``` bash
+```bash
 cd taskflow-frontend
+```
+
+Install dependencies:
+
+```bash
 npm install
 ```
 
-Create a `.env` file in the frontend directory:
+Create a `.env` file in the frontend root directory:
 
-``` env
+```env
 VITE_API_BASE_URL=http://localhost:8080/api/v1
 ```
 
-Start Vite:
+Start the Vite development server:
 
-``` bash
+```bash
 npm run dev
 ```
 
-Open the URL shown by Vite, normally:
+Open the local URL displayed in the terminal, usually:
 
-``` text
+```text
 http://localhost:5173
 ```
 
-Register an account and log in to use Taskflow.
+Register an account and log in to start using Taskflow.
 
-------------------------------------------------------------------------
+---
 
-## REST API
+## 🔗 REST API Reference
 
 **Base URL**
 
-``` text
+```text
 http://localhost:8080/api/v1
 ```
 
-Protected endpoints require a valid JWT access token in the request
-header:
+Protected endpoints require a valid JWT access token:
 
-``` http
+```http
 Authorization: Bearer <access-token>
 ```
 
 ### Authentication
 
-  Method   Endpoint           Description                      Access
-  -------- ------------------ -------------------------------- --------
-  `POST`   `/auth/register`   Register a new account           Public
-  `POST`   `/auth/login`      Authenticate and receive a JWT   Public
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| POST | `/auth/register` | Register a new account | Public |
+| POST | `/auth/login` | Authenticate and receive JWT | Public |
 
-### Tasks and dashboard
+### Task Management & Dashboard
 
-  --------------------------------------------------------------------------
-  Method                  Endpoint                   Description
-  ----------------------- -------------------------- -----------------------
-  `POST`                  `/tasks`                   Create a task
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/tasks` | Create a new task |
+| GET | `/tasks` | Retrieve tasks with filtering and pagination |
+| GET | `/tasks/{id}` | Retrieve a task by ID |
+| PUT | `/tasks/{id}` | Update task details |
+| PATCH | `/tasks/{id}/completion` | Update task completion status |
+| DELETE | `/tasks/{id}` | Delete a task |
+| GET | `/tasks/stats` | Retrieve task statistics |
+| GET | `/tasks/dashboard` | Retrieve dashboard statistics and task lists |
 
-  `GET`                   `/tasks`                   Retrieve tasks with
-                                                     filtering and
-                                                     pagination
+### Reminder Preferences
 
-  `GET`                   `/tasks/{id}`              Retrieve a task
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/reminders/preferences` | Retrieve the authenticated user's reminder preferences |
+| PUT | `/reminders/preferences` | Update the authenticated user's reminder preferences |
 
-  `PUT`                   `/tasks/{id}`              Update task details
+### Supported Task Query Parameters
 
-  `PATCH`                 `/tasks/{id}/completion`   Update completion
-                                                     status
+| Parameter | Description |
+|---|---|
+| `search` | Search by task title or description |
+| `priority` | Filter by task priority |
+| `completed` | Filter by completion status |
+| `sortBy` | Select a supported sorting field |
+| `direction` | Specify ascending or descending order |
+| `page` | Select the page number |
+| `size` | Specify the number of records per page |
 
-  `DELETE`                `/tasks/{id}`              Delete a task
+### API Documentation
 
-  `GET`                   `/tasks/stats`             Retrieve task
-                                                     statistics
+Taskflow uses Springdoc OpenAPI for interactive API documentation.
 
-  `GET`                   `/tasks/dashboard`         Retrieve dashboard
-                                                     statistics and task
-                                                     lists
-  --------------------------------------------------------------------------
+When the backend is running, access Swagger UI at:
 
-### Reminder preferences
-
-  --------------------------------------------------------------------------
-  Method                  Endpoint                   Description
-  ----------------------- -------------------------- -----------------------
-  `GET`                   `/reminders/preferences`   Retrieve the
-                                                     authenticated user's
-                                                     reminder preferences
-
-  `PUT`                   `/reminders/preferences`   Update the
-                                                     authenticated user's
-                                                     reminder preferences
-  --------------------------------------------------------------------------
-
-### Task query parameters
-
-The task listing endpoint supports:
-
-  Parameter     Description
-  ------------- -------------------------------------
-  `search`      Search task titles and descriptions
-  `priority`    Filter by priority
-  `completed`   Filter by completion status
-  `sortBy`      Select a supported sorting field
-  `direction`   Ascending or descending order
-  `page`        Page number
-  `size`        Number of records per page
-
-### API documentation
-
-Springdoc OpenAPI provides interactive API documentation while the
-backend is running:
-
-``` text
+```text
 http://localhost:8080/swagger-ui/index.html
 ```
 
-------------------------------------------------------------------------
+---
 
-## Security and Configuration Notes
+## 🔐 Security & Configuration
 
--   Passwords are hashed using BCrypt.
--   Protected API routes use stateless JWT authentication.
--   Task operations are scoped to the authenticated user.
--   Reminder preferences are associated with individual users.
--   Reminder processing uses database-backed claims and a unique
-    task/reminder-type/reminder-date constraint to reduce duplicate
-    sends.
--   Database, JWT, and Gmail credentials are supplied through
-    environment variables.
--   CORS is configured in the backend for approved frontend origins.
+Taskflow incorporates several backend security practices:
 
-**Local-development note:** The current project configuration is
-intended for local development. Before exposing the application
-publicly, configure production secrets, HTTPS, allowed origins, database
-migrations, backups, and an appropriate token-storage strategy. Browser
-`sessionStorage` is accessible to JavaScript and is not an HttpOnly
-cookie.
+- Passwords are stored using BCrypt hashing.
+- Protected endpoints use stateless JWT authentication.
+- Task operations are scoped to the authenticated user.
+- Reminder preferences are associated with individual accounts.
+- Reminder logs use database constraints and processing claims to reduce duplicate notifications.
+- Database credentials, JWT secrets, and Gmail credentials are supplied through environment variables.
+- CORS is configured for approved frontend origins.
+- Request validation and centralized exception handling are implemented.
 
-## Current Scope and Future Improvements
+**Important:** The current project is configured for local development. Before exposing it publicly, additional production preparation is required, including HTTPS, production secrets, database migrations, backups, and a more secure token-storage strategy. Browser `sessionStorage` is JavaScript-accessible and is not equivalent to an HttpOnly cookie.
 
-Taskflow currently runs locally and is not deployed to a public hosting
-provider.
+---
 
-Potential future improvements include:
+## 📌 Project Status & Future Improvements
 
--   Automated backend and frontend test coverage.
--   Refresh-token/session lifecycle improvements.
--   Email ownership verification and account recovery.
--   Production database migrations and backup automation.
--   Production deployment when suitable hosting is available.
+**Current status:** The full-stack application is implemented and runs locally. Public deployment is not configured.
 
-------------------------------------------------------------------------
+Potential future enhancements include:
 
-## Learning Outcomes
+- Expanded automated backend and frontend test coverage.
+- Refresh-token and session lifecycle improvements.
+- Email ownership verification and account recovery.
+- Production database migrations and automated backups.
+- Public deployment when suitable hosting is available.
 
-This project demonstrates practical experience with:
+---
 
--   Building a component-based frontend using React.
--   Developing REST APIs using Spring Boot.
--   Implementing JWT authentication with Spring Security.
--   Applying layered architecture and separation of concerns.
--   Designing relational data models with MySQL.
--   Integrating databases using Spring Data JPA and Hibernate.
--   Implementing CRUD operations, search, filtering, sorting, and
-    pagination.
--   Integrating frontend and backend using Axios.
--   Scheduling background jobs and sending email notifications.
--   Managing configuration and secrets through environment variables.
--   Building responsive interfaces and reusable components.
+## 🎯 Learning Outcomes
 
-------------------------------------------------------------------------
+Taskflow demonstrates practical experience with:
 
-## Author
+- Component-based frontend development using React.
+- RESTful API development using Spring Boot.
+- Authentication and authorization using Spring Security and JWT.
+- Layered backend architecture and separation of concerns.
+- Relational database design using MySQL.
+- ORM and persistence using Spring Data JPA and Hibernate.
+- CRUD operations, search, filtering, sorting, and pagination.
+- Frontend-backend integration using Axios.
+- Scheduled background jobs and email notifications.
+- Environment-based application configuration.
+- Responsive UI development and reusable components.
 
-```{=html}
+---
+
+## 👨‍💻 Author
+
 <p align="center">
-```
-`<strong>`{=html}Tanmay Tawade`</strong>`{=html} `<br />`{=html} Java
-Full Stack Developer \| React \| Spring Boot
-```{=html}
+  <strong>Tanmay Tawade</strong>
+  <br />
+  Java Full Stack Developer | React | Spring Boot
 </p>
-```
-```{=html}
-<p align="center">
-```
-`<a href="https://github.com/TanmayT134">`{=html}
-`<img src="https://img.shields.io/badge/GitHub-TanmayT134-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />`{=html}
-`</a>`{=html}
-`<a href="https://www.linkedin.com/in/tanmay-tawade-995829344/">`{=html}
-`<img src="https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />`{=html}
-`</a>`{=html}
-`<a href="https://portfolio-tanmay-tawade.vercel.app/">`{=html}
-`<img src="https://img.shields.io/badge/Portfolio-Visit-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" />`{=html}
-`</a>`{=html}
-```{=html}
-</p>
-```
 
-------------------------------------------------------------------------
-
-```{=html}
 <p align="center">
-```
-If you find this project interesting, consider giving the repository a
-star.
-```{=html}
+  <a href="https://github.com/TanmayT134">
+    <img src="https://img.shields.io/badge/GitHub-TanmayT134-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+  </a>
+  <a href="https://www.linkedin.com/in/tanmay-tawade-995829344/">
+    <img src="https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
+  </a>
+  <a href="https://portfolio-tanmay-tawade.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-Visit-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Portfolio" />
+  </a>
 </p>
-```
+
+---
+
+<p align="center">
+  ⭐ If you find Taskflow interesting, consider giving the repository a star!
+</p>
