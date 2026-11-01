@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, ListTodo, Clock3, CircleCheck, CalendarDays,
@@ -14,6 +15,7 @@ export default function Sidebar({ open, onClose }) {
   const [workspaceMenuOpen, setWorkspaceMenuOpen] = useState(false);
   const workspaceRef = useRef(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     function onPointerDown(event) {
@@ -49,15 +51,15 @@ export default function Sidebar({ open, onClose }) {
             aria-expanded={workspaceMenuOpen}
             aria-haspopup="menu"
           >
-            <span className="workspace-avatar">T</span>
-            <span className="workspace-copy"><b>My Workspace</b><small>Personal plan</small></span>
+            <span className="workspace-avatar">{(user?.fullName || user?.email || "U").charAt(0).toUpperCase()}</span>
+            <span className="workspace-copy"><b>{user?.fullName || "My Workspace"}</b><small>Personal workspace</small></span>
             <MoreHorizontal className="workspace-dots-icon" size={18} />
           </button>
           {workspaceMenuOpen && (
             <div className="workspace-popover" role="menu">
               <div className="workspace-popover-heading">
-                <span className="workspace-avatar">T</span>
-                <span><strong>My Workspace</strong><small>Personal plan · 1 workspace</small></span>
+                <span className="workspace-avatar">{(user?.fullName || user?.email || "U").charAt(0).toUpperCase()}</span>
+                <span><strong>{user?.fullName || "My Workspace"}</strong><small>{user?.email || "Personal workspace"}</small></span>
               </div>
               <button type="button" role="menuitem" onClick={() => goTo("/")}>
                 <LayoutDashboard size={15} /> Workspace overview <ChevronRight size={14} />

@@ -1,12 +1,11 @@
 package com.taskflow.taskflow_backend.service;
 
-import java.util.List;
-
 import com.taskflow.taskflow_backend.dto.request.TaskCompletionRequest;
 import com.taskflow.taskflow_backend.dto.request.TaskRequest;
 import com.taskflow.taskflow_backend.dto.response.TaskResponse;
 import com.taskflow.taskflow_backend.dto.response.DashboardStatsResponse;
 import com.taskflow.taskflow_backend.dto.response.TaskPageResponse;
+import com.taskflow.taskflow_backend.dto.response.DashboardResponse;
 
 public interface TaskService {
 
@@ -32,6 +31,8 @@ public interface TaskService {
     );
 
     void deleteTask(Long id);
-    
+
     DashboardStatsResponse getDashboardStats();
+    
+    DashboardResponse getDashboard();
 }

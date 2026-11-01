@@ -18,16 +18,27 @@ public class TaskSpecification {
     public static Specification<Task> filterTasks(
             String search,
             TaskPriority priority,
-            Boolean completed) {
+            Boolean completed,
+            Long userId
+    ) {
 
         return (root, query, criteriaBuilder) -> {
 
             List<Predicate> predicates = new ArrayList<>();
 
+            // Mandatory ownership condition
+            predicates.add(
+                    criteriaBuilder.equal(
+                            root.get("user").get("id"),
+                            userId
+                    )
+            );
+
             // Search by title or description
             if (search != null && !search.isBlank()) {
 
-                String keyword = "%" + search.trim().toLowerCase() + "%";
+                String keyword =
+                        "%" + search.trim().toLowerCase() + "%";
 
                 Predicate titleMatch = criteriaBuilder.like(
                         criteriaBuilder.lower(root.get("title")),
@@ -40,7 +51,10 @@ public class TaskSpecification {
                 );
 
                 predicates.add(
-                        criteriaBuilder.or(titleMatch, descriptionMatch)
+                        criteriaBuilder.or(
+                                titleMatch,
+                                descriptionMatch
+                        )
                 );
             }
 

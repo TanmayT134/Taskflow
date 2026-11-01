@@ -15,7 +15,6 @@ import { Link } from "react-router-dom";
 import { taskService } from "../services/taskService";
 import { getApiError } from "../services/api";
 import { greeting } from "../utils/format";
-import { fetchAllTaskPages } from "../utils/fetchAllTaskPages";
 
 import StatCard from "../components/StatCard";
 import TaskTable from "../components/TaskTable";
@@ -28,7 +27,7 @@ export default function Dashboard() {
     const { confirm, notify } = useFeedback();
     const [stats, setStats] = useState(null);
     const [tasks, setTasks] = useState([]);
-    const [allTasks, setAllTasks] = useState([]);
+    const [upcomingTasks, setUpcomingTasks] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const initialLoading = loading && stats === null;
@@ -43,38 +42,21 @@ export default function Dashboard() {
     const savingRef = useRef(false);
     const actionLocksRef = useRef(new Set());
 
-    // Load dashboard information. Priority data is collected across every page,
-    // not just the first 100 tasks, so the distribution remains accurate.
+    // Load all dashboard sections from the authenticated dashboard endpoint.
     async function loadDashboard() {
         const requestId = ++requestIdRef.current;
         setLoading(true);
         setError("");
 
         try {
-            const taskQuery = {
-                size: 100,
-                sortBy: "createdAt",
-                direction: "DESC",
-            };
-            // The first task page also supplies the five recent tasks, avoiding
-            // a second overlapping request for the same records.
-            const [statsData, firstTaskPage] = await Promise.all([
-                taskService.getStats(),
-                taskService.getTasks({ ...taskQuery, page: 0 }),
-            ]);
+            const dashboard = await taskService.getDashboard();
 
-            const completeTaskList = await fetchAllTaskPages(
-                firstTaskPage,
-                taskQuery,
-                taskService.getTasks,
-                4
-            );
-
-            // Ignore older requests that finish after a newer refresh.
+            // Ignore stale responses if a newer refresh has started.
             if (requestId !== requestIdRef.current) return;
-            setStats(statsData);
-            setTasks((firstTaskPage.content || []).slice(0, 5));
-            setAllTasks(completeTaskList);
+
+            setStats(dashboard?.stats ?? null);
+            setTasks(Array.isArray(dashboard?.recentTasks) ? dashboard.recentTasks : []);
+            setUpcomingTasks(Array.isArray(dashboard?.upcomingTasks) ? dashboard.upcomingTasks : []);
         } catch (err) {
             if (requestId === requestIdRef.current) setError(getApiError(err));
         } finally {
@@ -186,22 +168,15 @@ export default function Dashboard() {
         }
     }
 
-    // Calculate priority distribution from backend task data
-    // One pass over the collection is cheaper than three separate filters.
-    const priorityCounts = allTasks.reduce(
-        (counts, task) => {
-            if (task.priority === "HIGH") counts.HIGH += 1;
-            else if (task.priority === "MEDIUM") counts.MEDIUM += 1;
-            else if (task.priority === "LOW") counts.LOW += 1;
-            return counts;
-        },
-        { HIGH: 0, MEDIUM: 0, LOW: 0 }
-    );
+    // Priority distribution is calculated by the backend for this user.
+    const priorityCounts = {
+        HIGH: stats?.highPriorityTasks ?? 0,
+        MEDIUM: stats?.mediumPriorityTasks ?? 0,
+        LOW: stats?.lowPriorityTasks ?? 0,
+    };
 
     const totalPriorityTasks =
-        priorityCounts.HIGH +
-        priorityCounts.MEDIUM +
-        priorityCounts.LOW;
+        priorityCounts.HIGH + priorityCounts.MEDIUM + priorityCounts.LOW;
 
     const priorityItems = [
         {
@@ -402,6 +377,32 @@ export default function Dashboard() {
                             Based on {totalPriorityTasks} tasks
                         </div>
                     </div>
+                )}
+            </section>
+
+            {/* Upcoming tasks */}
+            <section className="panel recent-panel">
+                <div className="panel-heading">
+                    <div>
+                        <h3>Coming up next</h3>
+                        <p>Incomplete tasks due today or within the next seven days.</p>
+                    </div>
+                    <Link to="/pending" className="text-link">
+                        View pending tasks
+                        <ArrowUpRight size={15} />
+                    </Link>
+                </div>
+
+                {initialLoading ? (
+                    <TaskRowsSkeleton rows={3} />
+                ) : (
+                    <TaskTable
+                        tasks={upcomingTasks}
+                        onToggle={handleToggleTask}
+                        onEdit={handleEditTask}
+                        onDelete={handleDeleteTask}
+                        busyId={busyId}
+                    />
                 )}
             </section>
 

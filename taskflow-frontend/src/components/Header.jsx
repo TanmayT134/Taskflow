@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { taskService } from "../services/taskService";
 import { fetchAllTaskPages } from "../utils/fetchAllTaskPages";
 import { getApiError } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const titles = {
   "/": ["Overview", "Here’s what’s happening with your tasks."],
@@ -36,6 +37,7 @@ function formatDueDate(value) {
 export default function Header({ onMenu }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [title, subtitle] = titles[pathname] || ["Taskflow", "Your personal workspace."];
 
   const [search, setSearch] = useState("");
@@ -350,15 +352,15 @@ export default function Header({ onMenu }) {
             aria-expanded={activeMenu === "profile"}
             aria-label="Open profile menu"
           >
-            <span className="profile-avatar">T</span>
-            <span className="profile-copy"><b>My profile</b><small>Workspace owner</small></span>
+            <span className="profile-avatar">{(user?.fullName || user?.email || "U").charAt(0).toUpperCase()}</span>
+            <span className="profile-copy"><b>{user?.fullName || "My profile"}</b><small>{user?.email || "Signed in"}</small></span>
             <ChevronDown size={15} />
           </button>
           {activeMenu === "profile" && (
             <div className="header-popover compact-popover profile-popover">
               <div className="profile-menu-summary">
-                <span className="profile-avatar large">T</span>
-                <span><strong>Workspace owner</strong><small>Personal workspace</small></span>
+                <span className="profile-avatar large">{(user?.fullName || user?.email || "U").charAt(0).toUpperCase()}</span>
+                <span><strong>{user?.fullName || "Taskflow user"}</strong><small>{user?.email || "Signed in"}</small></span>
               </div>
               <button type="button" className="header-menu-item" onClick={() => { navigate("/settings"); setActiveMenu(null); }}>
                 <Settings size={16} /> Settings and preferences
@@ -366,7 +368,9 @@ export default function Header({ onMenu }) {
               <button type="button" className="header-menu-item" onClick={() => { navigate("/"); setActiveMenu(null); }}>
                 <LayoutDashboard size={16} /> Workspace overview
               </button>
-              <div className="header-menu-note">Profile editing and sign out will be available after account authentication is added.</div>
+              <button type="button" className="header-menu-item auth-logout-item" onClick={() => { logout(); navigate("/login", { replace: true }); setActiveMenu(null); }}>
+                <X size={16} /> Sign out
+              </button>
             </div>
           )}
         </div>

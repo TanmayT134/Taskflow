@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.taskflow.taskflow_backend.dto.response.ApiErrorResponse;
+import com.taskflow.taskflow_backend.exception.EmailAlreadyExistsException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -111,6 +112,19 @@ public class GlobalExceptionHandler {
 
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
+                request.getRequestURI(),
+                null
+        );
+    }
+    
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse> handleEmailAlreadyExists(
+            EmailAlreadyExistsException exception,
+            HttpServletRequest request) {
+
+        return buildErrorResponse(
+                HttpStatus.CONFLICT,
                 exception.getMessage(),
                 request.getRequestURI(),
                 null

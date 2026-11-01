@@ -12,6 +12,7 @@ import com.taskflow.taskflow_backend.dto.response.DashboardStatsResponse;
 import com.taskflow.taskflow_backend.dto.response.TaskPageResponse;
 import com.taskflow.taskflow_backend.dto.response.TaskResponse;
 import com.taskflow.taskflow_backend.service.TaskService;
+import com.taskflow.taskflow_backend.dto.response.DashboardResponse;
 
 import jakarta.validation.Valid;
 
@@ -117,4 +118,16 @@ public class TaskController {
 
         return ResponseEntity.ok(stats);
     }
+    
+
+    // Get complete dashboard data
+
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardResponse> getDashboard() {
+
+        DashboardResponse dashboard = taskService.getDashboard();
+
+        return ResponseEntity.ok(dashboard);
+    }
+
 }

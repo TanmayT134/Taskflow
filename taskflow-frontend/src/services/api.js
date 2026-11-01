@@ -6,6 +6,29 @@ const api = axios.create({
   timeout: 15000,
 });
 
+
+// Attach the current session token to every protected API request.
+api.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem("taskflow.accessToken");
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// A rejected protected request invalidates the local session.
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const url = error.config?.url || "";
+    const isAuthRequest = url.includes("/auth/login") || url.includes("/auth/register");
+    if (error.response?.status === 401 && !isAuthRequest) {
+      sessionStorage.removeItem("taskflow.accessToken");
+      sessionStorage.removeItem("taskflow.user");
+      window.dispatchEvent(new Event("taskflow:unauthorized"));
+    }
+    return Promise.reject(error);
+  }
+);
+
 function cleanMessage(value) {
   if (typeof value !== "string") return "";
   const message = value.trim();

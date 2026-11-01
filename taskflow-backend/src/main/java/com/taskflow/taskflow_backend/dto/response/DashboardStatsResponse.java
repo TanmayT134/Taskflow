@@ -1,3 +1,4 @@
+
 package com.taskflow.taskflow_backend.dto.response;
 
 public class DashboardStatsResponse {
@@ -6,7 +7,12 @@ public class DashboardStatsResponse {
     private long completedTasks;
     private long pendingTasks;
     private long overdueTasks;
+
     private double completionPercentage;
+
+    private long highPriorityTasks;
+    private long mediumPriorityTasks;
+    private long lowPriorityTasks;
 
     public DashboardStatsResponse() {
     }
@@ -16,13 +22,19 @@ public class DashboardStatsResponse {
             long completedTasks,
             long pendingTasks,
             long overdueTasks,
-            double completionPercentage) {
-
+            double completionPercentage,
+            long highPriorityTasks,
+            long mediumPriorityTasks,
+            long lowPriorityTasks
+    ) {
         this.totalTasks = totalTasks;
         this.completedTasks = completedTasks;
         this.pendingTasks = pendingTasks;
         this.overdueTasks = overdueTasks;
         this.completionPercentage = completionPercentage;
+        this.highPriorityTasks = highPriorityTasks;
+        this.mediumPriorityTasks = mediumPriorityTasks;
+        this.lowPriorityTasks = lowPriorityTasks;
     }
 
     public long getTotalTasks() {
@@ -63,5 +75,29 @@ public class DashboardStatsResponse {
 
     public void setCompletionPercentage(double completionPercentage) {
         this.completionPercentage = completionPercentage;
+    }
+
+    public long getHighPriorityTasks() {
+        return highPriorityTasks;
+    }
+
+    public void setHighPriorityTasks(long highPriorityTasks) {
+        this.highPriorityTasks = highPriorityTasks;
+    }
+
+    public long getMediumPriorityTasks() {
+        return mediumPriorityTasks;
+    }
+
+    public void setMediumPriorityTasks(long mediumPriorityTasks) {
+        this.mediumPriorityTasks = mediumPriorityTasks;
+    }
+
+    public long getLowPriorityTasks() {
+        return lowPriorityTasks;
+    }
+
+    public void setLowPriorityTasks(long lowPriorityTasks) {
+        this.lowPriorityTasks = lowPriorityTasks;
     }
 }
