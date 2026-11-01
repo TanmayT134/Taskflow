@@ -1,6 +1,7 @@
 
 package com.taskflow.taskflow_backend.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.taskflow.taskflow_backend.security.JwtAuthenticationFilter;
@@ -8,6 +9,7 @@ import com.taskflow.taskflow_backend.service.CustomUserDetailsService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.http.HttpMethod;
 
@@ -37,6 +39,9 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.cors.allowed-origins:http://localhost:5173,http://127.0.0.1:5173}")
+    private String allowedOrigins;
+
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             CustomUserDetailsService userDetailsService,
@@ -57,10 +62,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Allowed frontend origins
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173"
-        ));
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        configuration.setAllowedOrigins(origins);
 
         // Allowed HTTP methods
         configuration.setAllowedMethods(List.of(

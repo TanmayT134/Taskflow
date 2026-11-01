@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.taskflow.taskflow_backend.entity.Task;
 import com.taskflow.taskflow_backend.enums.TaskPriority;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 public interface TaskRepository extends JpaRepository<Task, Long>,
         JpaSpecificationExecutor<Task> {
 
@@ -48,6 +50,29 @@ public interface TaskRepository extends JpaRepository<Task, Long>,
 
     List<Task> findTop5ByUser_IdOrderByCreatedAtDescIdDesc(
             Long userId
+    );
+    
+ // Find pending tasks belonging to a specific user and due on a date
+    @EntityGraph(attributePaths = "user")
+    List<Task> findByUser_IdAndCompletedFalseAndDueDate(
+            Long userId,
+            LocalDate dueDate
+    );
+
+    // Find overdue pending tasks belonging to a specific user
+    @EntityGraph(attributePaths = "user")
+    List<Task> findByUser_IdAndCompletedFalseAndDueDateBefore(
+            Long userId,
+            LocalDate dueDate
+    );
+
+    // Recheck that the task belongs to the user,
+    // is still pending, and its due date has not changed
+    @EntityGraph(attributePaths = "user")
+    Optional<Task> findByIdAndUser_IdAndCompletedFalseAndDueDate(
+            Long id,
+            Long userId,
+            LocalDate dueDate
     );
 
 }

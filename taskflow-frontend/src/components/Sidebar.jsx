@@ -18,6 +18,15 @@ export default function Sidebar({ open, onClose }) {
   const { user } = useAuth();
 
   useEffect(() => {
+    if (!open) return undefined;
+    function onKeyDown(event) {
+      if (event.key === "Escape") onClose?.();
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open, onClose]);
+
+  useEffect(() => {
     function onPointerDown(event) {
       if (workspaceRef.current && !workspaceRef.current.contains(event.target)) {
         setWorkspaceMenuOpen(false);
@@ -36,7 +45,7 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       {open && <button type="button" className="mobile-scrim" aria-label="Close navigation" onClick={onClose} />}
-      <aside className={`sidebar ${open ? "sidebar-open" : ""}`}>
+      <aside className={`sidebar ${open ? "sidebar-open" : ""}`} aria-label="Main sidebar">
         <div className="brand">
           <div className="brand-mark"><CheckCheck size={21} /></div>
           <div><strong>Taskflow</strong><span>PERSONAL WORKSPACE</span></div>
@@ -72,7 +81,7 @@ export default function Sidebar({ open, onClose }) {
           )}
         </div>
 
-        <nav className="side-nav">
+        <nav className="side-nav" aria-label="Main navigation">
           {groups.map((group) => (
             <section className="nav-group" key={group.title}>
               <p className="nav-heading">{group.title}</p>

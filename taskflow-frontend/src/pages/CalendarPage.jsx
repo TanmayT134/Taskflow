@@ -411,6 +411,7 @@ export default function CalendarPage() {
       <TaskModal
         open={modalOpen}
         task={editing}
+        initialDueDate={selectedDate}
         onClose={() => {
           setModalOpen(false);
           setEditing(null);

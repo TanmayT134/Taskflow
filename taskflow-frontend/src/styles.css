@@ -4305,3 +4305,855 @@ textarea:focus-visible {
     animation-duration: 2s;
   }
 }
+
+/* =========================================
+   ACCOUNT-LEVEL EMAIL REMINDER PREFERENCES
+========================================= */
+.reminder-settings .settings-section-heading {
+  align-items: center;
+}
+
+.reminder-status {
+  margin-left: auto;
+  padding: 6px 9px;
+  border-radius: 20px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .35px;
+  white-space: nowrap;
+  background: #f1f3f7;
+  color: #8993a5;
+}
+
+.reminder-status.is-on {
+  color: #25835f;
+  background: #eaf8f1;
+}
+
+.reminder-status.is-off {
+  color: #9a7a46;
+  background: #fbf4e8;
+}
+
+.reminder-loading {
+  padding: 22px 0 5px;
+  color: #929cad;
+  font-size: 11px;
+}
+
+.reminder-error {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #ffdfdc;
+  border-radius: 8px;
+  background: #fff4f2;
+  color: #b95d58;
+  font-size: 11px;
+}
+
+.reminder-error span {
+  flex: 1;
+}
+
+.reminder-feedback {
+  margin-top: 15px;
+}
+
+.reminder-master {
+  margin-top: 2px;
+}
+
+.reminder-options {
+  padding-left: 17px;
+  border-left: 2px solid #edf0f6;
+  transition: opacity .2s;
+}
+
+.reminder-options.is-disabled {
+  opacity: .55;
+}
+
+.reminder-switch {
+  position: relative;
+  display: inline-flex;
+  width: 40px;
+  height: 23px;
+  flex: 0 0 40px;
+  cursor: pointer;
+}
+
+.reminder-switch input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.reminder-switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: #dce1eb;
+  transition: background .2s;
+}
+
+.reminder-switch span::after {
+  content: "";
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px #17203330;
+  transition: transform .2s;
+}
+
+.reminder-switch input:checked+span {
+  background: var(--taskflow-accent, #5368e8);
+}
+
+.reminder-switch input:checked+span::after {
+  transform: translateX(17px);
+}
+
+.reminder-switch input:focus-visible+span {
+  outline: 3px solid color-mix(in srgb, var(--taskflow-accent, #5368e8) 25%, transparent);
+  outline-offset: 2px;
+}
+
+.reminder-switch input:disabled+span {
+  cursor: not-allowed;
+  opacity: .65;
+}
+
+.reminder-time-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 37px;
+  padding: 0 10px;
+  border: 1px solid #e7eaf1;
+  border-radius: 8px;
+  color: #8994a7;
+}
+
+.reminder-time-control input {
+  width: 90px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #59657a;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.reminder-time-control:focus-within {
+  border-color: var(--taskflow-accent, #5368e8);
+}
+
+.reminder-timezone {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  padding: 13px 0;
+  font-size: 10px;
+}
+
+.reminder-timezone span {
+  color: #9aa3b1;
+}
+
+.reminder-timezone strong {
+  color: #59657a;
+  font-weight: 700;
+}
+
+.reminder-timezone small {
+  color: #a5adba;
+}
+
+.reminder-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 15px;
+  border-top: 1px solid #f0f2f6;
+}
+
+.reminder-save-row>span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #9aa3b1;
+  font-size: 10px;
+}
+
+.reminder-save-row .btn:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+:root[data-theme="dark"] .reminder-time-control {
+  background: #202a3d;
+  border-color: #354158;
+}
+
+:root[data-theme="dark"] .reminder-time-control input,
+:root[data-theme="dark"] .reminder-timezone strong {
+  color: #e7ebf3;
+}
+
+:root[data-theme="dark"] .reminder-options {
+  border-left-color: #354158;
+}
+
+@media(max-width:760px) {
+  .reminder-settings .settings-section-heading {
+    align-items: flex-start;
+  }
+
+  .reminder-status {
+    margin-left: auto;
+  }
+
+  .reminder-save-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .reminder-save-row .btn {
+    width: 100%;
+  }
+
+  .reminder-timezone {
+    flex-wrap: wrap;
+  }
+}
+
+/* =========================================
+   STAGE 3 — ACCESSIBILITY & RESILIENCE
+========================================= */
+.skip-to-content {
+  position: fixed;
+  z-index: 1000;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: var(--taskflow-accent, #5368e8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform .18s ease;
+}
+
+.skip-to-content:focus {
+  transform: translateY(0);
+}
+
+.page-content:focus {
+  outline: none;
+}
+
+.route-error-state {
+  display: flex;
+  min-height: 360px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.route-error-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  background: #fff0ed;
+  color: #c65e50;
+}
+
+.route-error-state .eyebrow {
+  margin: 0 0 8px;
+}
+
+.route-error-state h2 {
+  margin: 0;
+  color: var(--text-primary, #202a3d);
+  font-size: 21px;
+}
+
+.route-error-state>p:not(.eyebrow) {
+  max-width: 390px;
+  margin: 10px 0 20px;
+  color: var(--text-muted, #8993a5);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.route-error-state .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:root[data-theme="dark"] .route-error-icon {
+  background: #3a292b;
+  color: #ff9a8c;
+}
+
+:root[data-theme="dark"] .route-error-state h2 {
+  color: #edf1f8;
+}
+
+@media (max-width: 760px) {
+  .route-error-state {
+    min-height: 300px;
+  }
+
+  .route-error-state h2 {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-to-content {
+    transition: none;
+  }
+}
+
+/* =========================================
+   STAGE 3 — PART 2: RESPONSIVE PAGE REFINEMENT
+   Additive overrides; existing desktop layout and behavior are preserved.
+========================================= */
+
+.app-shell,
+.main-area,
+.page-content,
+.dashboard-page,
+.tasks-page,
+.calendar-page,
+.settings-page {
+  min-width: 0;
+}
+
+.page-content > * {
+  min-width: 0;
+}
+
+.panel,
+.stat-card,
+.progress-panel,
+.focus-card {
+  min-width: 0;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--taskflow-accent, #5368e8) 75%, white);
+  outline-offset: 2px;
+}
+
+/* Tablet: use the available width instead of allowing dense two-column panels. */
+@media (max-width: 1024px) {
+  .page-content {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .dashboard-lower {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, .85fr);
+  }
+
+  .calendar-agenda-list {
+    gap: 8px;
+  }
+
+  .settings-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Phones and narrow tablets. */
+@media (max-width: 760px) {
+  .welcome-row {
+    flex-wrap: wrap;
+  }
+
+  .welcome-row > div:first-child {
+    min-width: 0;
+    flex: 1 1 220px;
+  }
+
+  .welcome-row > .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .dashboard-lower {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .priority-panel,
+  .recent-panel,
+  .task-panel,
+  .calendar-panel,
+  .calendar-agenda,
+  .settings-section {
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .panel-heading {
+    gap: 10px;
+  }
+
+  .panel-heading > * {
+    min-width: 0;
+  }
+
+  .tasks-toolbar,
+  .tasks-page .list-toolbar {
+    width: 100%;
+  }
+
+  .status-tabs {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    white-space: nowrap;
+    padding-bottom: 1px;
+  }
+
+  .status-tab {
+    flex: 0 0 auto;
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .toolbar-filters {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .toolbar-filters label,
+  .sort-select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .toolbar-filters label select {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .pagination-enhanced {
+    align-items: flex-start;
+  }
+
+  .pagination-info {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .calendar-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .calendar-month-heading {
+    flex: 1 1 150px;
+    min-width: 0;
+  }
+
+  .calendar-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .calendar-panel {
+    overflow: hidden;
+  }
+
+  .calendar-grid {
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  .calendar-weekday {
+    min-width: 0;
+    min-height: 32px;
+    font-size: 9px;
+  }
+
+  .calendar-day {
+    min-width: 0;
+    min-height: 82px;
+    padding: 6px 3px;
+    gap: 4px;
+    overflow: hidden;
+  }
+
+  .calendar-day-number {
+    width: 22px;
+    height: 22px;
+    font-size: 9px;
+  }
+
+  .calendar-day-meta {
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  .calendar-day-meta small {
+    font-size: 7px;
+  }
+
+  .calendar-task-chip {
+    padding: 2px 3px;
+    font-size: 7px;
+  }
+
+  .calendar-legend {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+  }
+
+  .calendar-agenda-task {
+    min-width: 0;
+  }
+
+  .settings-intro {
+    margin-bottom: 18px;
+  }
+
+  .settings-field,
+  .settings-export-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .settings-field > div:first-child,
+  .settings-export-row > div:first-child {
+    min-width: 0;
+    width: 100%;
+    flex: 0 1 auto;
+  }
+
+  .settings-choice-row {
+    flex-wrap: wrap;
+  }
+
+  .settings-choice {
+    flex: 1 1 95px;
+  }
+
+  .settings-select {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .settings-export-row .btn {
+    width: 100%;
+  }
+
+  .settings-app-info {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
+  .reminder-options {
+    padding-left: 12px;
+  }
+
+  .task-row {
+    align-items: flex-start;
+  }
+
+  .task-main {
+    min-width: 0;
+  }
+
+  .task-title-line {
+    align-items: flex-start;
+  }
+
+  .task-main > p {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+  }
+
+  .task-actions {
+    flex: 0 0 auto;
+  }
+
+  .task-modal {
+    width: min(100%, 510px);
+    max-height: calc(100dvh - 24px);
+    padding: 18px;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+    align-items: center;
+  }
+
+  .app-footer {
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+}
+
+/* Small phones: keep controls legible and prevent horizontal page overflow. */
+@media (max-width: 480px) {
+  .page-content {
+    padding: 20px 12px 28px;
+  }
+
+  .topbar {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+
+  .page-heading {
+    min-width: 0;
+  }
+
+  .page-heading h1 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .page-heading p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 155px;
+  }
+
+  .topbar-actions {
+    gap: 5px;
+  }
+
+  .welcome-row {
+    gap: 10px;
+  }
+
+  .welcome-row h2 {
+    font-size: 19px;
+    overflow-wrap: anywhere;
+  }
+
+  .welcome-row > .btn {
+    height: 34px;
+    padding: 0 9px;
+    font-size: 9px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .stat-card {
+    min-height: 116px;
+    padding: 12px;
+  }
+
+  .stat-icon {
+    width: 30px;
+    height: 30px;
+    margin-bottom: 9px;
+  }
+
+  .stat-value {
+    font-size: 21px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-card p {
+    font-size: 9px;
+  }
+
+  .task-panel,
+  .recent-panel,
+  .priority-panel,
+  .calendar-panel,
+  .calendar-agenda,
+  .settings-section,
+  .progress-panel {
+    padding: 13px;
+  }
+
+  .task-row {
+    gap: 7px;
+    padding: 12px 0;
+  }
+
+  .task-actions .icon-button {
+    width: 26px;
+    height: 28px;
+  }
+
+  .task-title-line h3 {
+    overflow-wrap: anywhere;
+  }
+
+  .priority {
+    font-size: 7px;
+    padding: 3px 5px;
+  }
+
+  .toolbar-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .calendar-toolbar {
+    gap: 10px;
+  }
+
+  .calendar-nav {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .calendar-today {
+    margin-right: auto;
+  }
+
+  .calendar-weekday {
+    min-height: 28px;
+    font-size: 8px;
+  }
+
+  .calendar-day {
+    min-height: 60px;
+    padding: 4px 2px;
+    gap: 3px;
+  }
+
+  .calendar-day-number {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    font-size: 8px;
+  }
+
+  .calendar-day-preview {
+    display: none;
+  }
+
+  .calendar-day-meta {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .calendar-day-meta small {
+    display: none;
+  }
+
+  .calendar-dot {
+    width: 6px;
+    height: 6px;
+    flex-basis: 6px;
+  }
+
+  .calendar-more {
+    display: none;
+  }
+
+  .calendar-legend {
+    font-size: 9px;
+  }
+
+  .settings-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .settings-stat {
+    padding: 10px;
+  }
+
+  .settings-app-info {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .settings-app-info strong {
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
+  }
+
+  .settings-section-heading {
+    align-items: flex-start;
+  }
+
+  .settings-section-heading p {
+    line-height: 1.5;
+  }
+
+  .reminder-status {
+    margin-left: 0;
+  }
+
+  .reminder-time-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .reminder-time-control input {
+    width: 110px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .modal-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calendar-day,
+  .task-row,
+  .task-row .check-button {
+    transition: none !important;
+  }
+}

@@ -9,7 +9,14 @@ const blank = {
   dueDate: "",
 };
 
-export default function TaskModal({ open, onClose, onSave, task, saving }) {
+export default function TaskModal({
+  open,
+  onClose,
+  onSave,
+  task,
+  saving,
+  initialDueDate = "",
+}) {
   const { preferences } = usePreferences();
   const [form, setForm] = useState(blank);
   const [validationError, setValidationError] = useState("");
@@ -31,7 +38,11 @@ export default function TaskModal({ open, onClose, onSave, task, saving }) {
             priority: task.priority || "MEDIUM",
             dueDate: task.dueDate || "",
           }
-        : { ...blank, priority: preferences.defaultPriority }
+        : {
+            ...blank,
+            priority: preferences.defaultPriority,
+            dueDate: initialDueDate || "",
+          }
     );
 
     const focusFrame = window.requestAnimationFrame(() => titleRef.current?.focus());
@@ -39,7 +50,7 @@ export default function TaskModal({ open, onClose, onSave, task, saving }) {
       window.cancelAnimationFrame(focusFrame);
       previousFocusRef.current?.focus?.();
     };
-  }, [task, open, preferences.defaultPriority]);
+  }, [task, open, preferences.defaultPriority, initialDueDate]);
 
   useEffect(() => {
     if (!open) return undefined;

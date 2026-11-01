@@ -31,6 +31,7 @@ import com.taskflow.taskflow_backend.enums.TaskPriority;
 import com.taskflow.taskflow_backend.exception.ResourceNotFoundException;
 
 import com.taskflow.taskflow_backend.repository.TaskRepository;
+import com.taskflow.taskflow_backend.repository.TaskReminderLogRepository;
 import com.taskflow.taskflow_backend.repository.UserRepository;
 
 import com.taskflow.taskflow_backend.security.TaskflowUserDetails;
@@ -50,6 +51,7 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final TaskReminderLogRepository reminderLogRepository;
 
     private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
             "id",
@@ -63,10 +65,12 @@ public class TaskServiceImpl implements TaskService {
 
     public TaskServiceImpl(
             TaskRepository taskRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            TaskReminderLogRepository reminderLogRepository
     ) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.reminderLogRepository = reminderLogRepository;
     }
 
     // ==========================================
@@ -349,6 +353,9 @@ public class TaskServiceImpl implements TaskService {
 
         Task existingTask = findTaskById(id, userId);
 
+        // Reminder logs reference the task and must be removed first.
+        // This service method is transactional, so both operations commit together.
+        reminderLogRepository.deleteAllByTaskId(existingTask.getId());
         taskRepository.delete(existingTask);
     }
 
